@@ -1,0 +1,23 @@
+module(
+    name = "multi_gcc_toolchain",
+    version = "1.0.0",
+)
+
+bazel_dep(name = "platforms", version = "0.0.8")
+
+# Register Fedora GCC extension
+fedora_gcc_ext = use_extension("//fedora_gcc:extensions.bzl", "fedora_gcc_extension")
+use_repo(fedora_gcc_ext, "fedora_gcc_repo")
+
+# Register CentOS GCC extension
+centos_gcc_ext = use_extension("//centos_gcc:extensions.bzl", "centos_gcc_extension")
+use_repo(centos_gcc_ext, "centos_gcc_repo")
+
+# Note: Toolchains are not auto-registered here.
+# Users should register the specific toolchain they want in their own MODULE.bazel:
+#
+# For Fedora:
+#   register_toolchains("@fedora_gcc_repo//:gcc_toolchain_linux_x86_64")
+#
+# For CentOS:
+#   register_toolchains("@centos_gcc_repo//:gcc_toolchain_linux_x86_64")

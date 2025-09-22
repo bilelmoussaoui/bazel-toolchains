@@ -1,0 +1,9 @@
+# Common utilities for GCC toolchains
+# This package provides shared code for all distribution-specific toolchains
+
+package(default_visibility = ["//visibility:public"])
+
+# Export the shared utilities
+exports_files([
+    "toolchain_utils.bzl",
+])

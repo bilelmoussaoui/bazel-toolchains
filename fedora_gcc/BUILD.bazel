@@ -1,0 +1,26 @@
+# Fedora GCC Toolchain
+# This package provides an isolated GCC toolchain built from Fedora RPM packages
+
+package(default_visibility = ["//visibility:public"])
+
+# Export the extension for use by other modules
+exports_files([
+    "extensions.bzl",
+])
+
+# Convenience aliases to the generated toolchain
+alias(
+    name = "gcc_toolchain",
+    actual = "@fedora_gcc_repo//:gcc_toolchain",
+)
+
+# Architecture-specific toolchain aliases
+alias(
+    name = "gcc_toolchain_linux_x86_64",
+    actual = "@fedora_gcc_repo//:gcc_toolchain_linux_x86_64",
+)
+
+alias(
+    name = "gcc_toolchain_linux_aarch64",
+    actual = "@fedora_gcc_repo//:gcc_toolchain_linux_aarch64",
+)

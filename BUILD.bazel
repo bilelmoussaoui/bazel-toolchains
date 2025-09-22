@@ -1,0 +1,36 @@
+# Multi-Distribution GCC Toolchains
+# This package provides isolated GCC toolchains built from various Linux distribution RPM packages
+
+package(default_visibility = ["//visibility:public"])
+
+# Convenience aliases to Fedora toolchain
+alias(
+    name = "fedora_gcc_toolchain",
+    actual = "//fedora_gcc:gcc_toolchain",
+)
+
+alias(
+    name = "fedora_gcc_toolchain_linux_x86_64",
+    actual = "//fedora_gcc:gcc_toolchain_linux_x86_64",
+)
+
+alias(
+    name = "fedora_gcc_toolchain_linux_aarch64",
+    actual = "//fedora_gcc:gcc_toolchain_linux_aarch64",
+)
+
+# Convenience aliases to CentOS toolchain
+alias(
+    name = "centos_gcc_toolchain",
+    actual = "//centos_gcc:gcc_toolchain",
+)
+
+alias(
+    name = "centos_gcc_toolchain_linux_x86_64",
+    actual = "//centos_gcc:gcc_toolchain_linux_x86_64",
+)
+
+alias(
+    name = "centos_gcc_toolchain_linux_aarch64",
+    actual = "//centos_gcc:gcc_toolchain_linux_aarch64",
+)
