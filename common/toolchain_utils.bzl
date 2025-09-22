@@ -266,15 +266,41 @@ toolchain(
         bazel_cpu = bazel_cpu
     )
 
-def generate_cc_toolchain_config(module_name):
+def generate_cc_toolchain_config(module_name, distro_flags = None):
     """Generate cc_toolchain_config.bzl content with isolated GCC configuration.
 
     Args:
         module_name: The module name for generating correct external paths
+        distro_flags: Dictionary with distribution-specific flags (optional)
+                     Expected format: {
+                         "c_flags": [...],      # Additional C flags
+                         "cxx_flags": [...],    # Additional C++ flags
+                         "link_flags": [...]    # Additional linker flags
+                     }
 
     Returns:
         String content for cc_toolchain_config.bzl file with proper header/library isolation
     """
+    # Prepare distribution-specific flags
+    if not distro_flags:
+        distro_flags = {"c_flags": [], "cxx_flags": [], "link_flags": []}
+
+    # Convert flag lists to string format for template
+    c_flags_str = ""
+    if distro_flags.get("c_flags"):
+        quoted_flags = ['"{}"'.format(flag) for flag in distro_flags["c_flags"]]
+        c_flags_str = ",\n".join([""] + quoted_flags)
+
+    cxx_flags_str = ""
+    if distro_flags.get("cxx_flags"):
+        quoted_flags = ['"{}"'.format(flag) for flag in distro_flags["cxx_flags"]]
+        cxx_flags_str = ",\n".join([""] + quoted_flags)
+
+    link_flags_str = ""
+    if distro_flags.get("link_flags"):
+        quoted_flags = ['"{}"'.format(flag) for flag in distro_flags["link_flags"]]
+        link_flags_str = ",\n".join([""] + quoted_flags)
+
     return '''
 load("@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl",
      "feature", "flag_group", "flag_set", "tool_path", "with_feature_set")
@@ -312,7 +338,7 @@ def _impl(ctx):
                             "-Wno-builtin-macro-redefined",
                             "-D__DATE__=redacted",
                             "-D__TIMESTAMP__=redacted",
-                            "-D__TIME__=redacted",
+                            "-D__TIME__=redacted"{c_flags_str},
                         ],
                     ),
                 ],
@@ -335,7 +361,7 @@ def _impl(ctx):
                             "-Wno-builtin-macro-redefined",
                             "-D__DATE__=redacted",
                             "-D__TIMESTAMP__=redacted",
-                            "-D__TIME__=redacted",
+                            "-D__TIME__=redacted"{cxx_flags_str},
                         ],
                     ),
                 ],
@@ -360,7 +386,7 @@ def _impl(ctx):
                             "-L" + "external/{module_name}++{extension_name}+{repo_name}/usr/lib64",
                             "-L" + "external/{module_name}++{extension_name}+{repo_name}/usr/lib",
                             "-lstdc++",
-                            "-lm",
+                            "-lm"{link_flags_str},
                         ],
                     ),
                 ],
@@ -402,5 +428,8 @@ cc_toolchain_config = rule(
         module_name = module_name["module_name"],
         extension_name = module_name["extension_name"],
         repo_name = module_name["repo_name"],
-        distro_name = module_name["distro_name"]
+        distro_name = module_name["distro_name"],
+        c_flags_str = c_flags_str,
+        cxx_flags_str = cxx_flags_str,
+        link_flags_str = link_flags_str
     )

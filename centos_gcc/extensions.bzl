@@ -125,6 +125,22 @@ def _centos_gcc_toolchain_impl(repository_ctx):
     build_content = generate_build_file(gcc_version, include_dirs, rpm_arch)
     repository_ctx.file("BUILD.bazel", build_content)
 
+    # Define CentOS-specific compiler flags
+    centos_flags = {
+        "c_flags": [
+            # Add CentOS-specific C flags here
+            # Example: "-O2", "-g", "-pipe", "-Wall", "-Werror=format-security"
+        ],
+        "cxx_flags": [
+            # Add CentOS-specific C++ flags here
+            # Example: "-O2", "-g", "-pipe", "-Wall", "-Werror=format-security"
+        ],
+        "link_flags": [
+            # Add CentOS-specific linker flags here
+            # Example: "-Wl,-z,relro", "-Wl,-z,now"
+        ]
+    }
+
     # Use shared toolchain config generation
     module_names = {
         "module_name": "multi_gcc_toolchain",
@@ -132,7 +148,7 @@ def _centos_gcc_toolchain_impl(repository_ctx):
         "repo_name": "centos_gcc_repo",
         "distro_name": "centos"
     }
-    repository_ctx.file("cc_toolchain_config.bzl", generate_cc_toolchain_config(module_names))
+    repository_ctx.file("cc_toolchain_config.bzl", generate_cc_toolchain_config(module_names, centos_flags))
 
 # Define the repository rule
 centos_gcc_toolchain = repository_rule(

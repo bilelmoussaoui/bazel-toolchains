@@ -123,6 +123,27 @@ def _fedora_gcc_toolchain_impl(repository_ctx):
     build_content = generate_build_file(gcc_version, include_dirs, rpm_arch)
     repository_ctx.file("BUILD.bazel", build_content)
 
+    # Define Fedora-specific compiler flags
+    fedora_flags = {
+        "c_flags": [
+            "-O2",
+            "-g",
+            "-pipe",
+            "-fstack-protector-strong",
+            "-Wpedantic",
+        ],
+        "cxx_flags": [
+            "-O2",
+            "-g",
+            "-pipe",
+            "-fstack-protector-strong",
+        ],
+        "link_flags": [
+            "-Wl,-z,relro",
+            "-Wl,-z,now",
+        ]
+    }
+
     # Use shared toolchain config generation
     module_names = {
         "module_name": "multi_gcc_toolchain",
@@ -130,7 +151,7 @@ def _fedora_gcc_toolchain_impl(repository_ctx):
         "repo_name": "fedora_gcc_repo",
         "distro_name": "fedora"
     }
-    repository_ctx.file("cc_toolchain_config.bzl", generate_cc_toolchain_config(module_names))
+    repository_ctx.file("cc_toolchain_config.bzl", generate_cc_toolchain_config(module_names, fedora_flags))
 
 # Define the repository rule
 fedora_gcc_toolchain = repository_rule(
