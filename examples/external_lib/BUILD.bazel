@@ -1,0 +1,14 @@
+# External library example using nlohmann/json
+
+cc_binary(
+    name = "json_demo",
+    srcs = ["main.cpp"],
+    deps = ["@nlohmann_json//:json"],
+)
+
+cc_binary(
+    name = "json_demo_static",
+    srcs = ["main.cpp"],
+    deps = ["@nlohmann_json//:json"],
+    linkstatic = True,
+)

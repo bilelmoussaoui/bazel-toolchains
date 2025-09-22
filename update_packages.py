@@ -181,7 +181,8 @@ def main():
         'binutils',
         'glibc-devel',
         'libstdc++-devel',
-        'libstdc++'
+        'libstdc++',
+        'kernel-headers'
     ]
 
     packages_info = {}

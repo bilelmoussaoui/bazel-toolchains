@@ -49,6 +49,11 @@ _PACKAGES_BY_ARCH = {
             "sha256": "d598086c3a9a4243a3f43deec43cdc39f5253264b9162fde40f75a5eff162a47",
             "subpath": "l"
         },
+        "kernel-headers": {
+            "version": "6.14.0-63.fc42",
+            "sha256": "253b4aa5bd18ca9798b9c631941d1a6478c22d2f91163a1a1fe740f280a3a0aa",
+            "subpath": "k"
+        },
     },
     "aarch64": {
         "gcc": {
@@ -85,6 +90,11 @@ _PACKAGES_BY_ARCH = {
             "version": "15.0.1-0.11.fc42",
             "sha256": "d1a70158509f636a43a0c643453751710c368f0921ceaef4b31e67896ac34bed",
             "subpath": "l"
+        },
+        "kernel-headers": {
+            "version": "6.14.0-63.fc42",
+            "sha256": "d4b2bf8420ae9606c7df17dc39a524dc0fd67c5a016549fc57c791073093e0ac",
+            "subpath": "k"
         },
     },
 }
