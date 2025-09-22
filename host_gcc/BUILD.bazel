@@ -1,0 +1,20 @@
+# Host GCC toolchain using system-installed packages
+# This toolchain detects and uses the host system's GCC installation
+
+package(default_visibility = ["//visibility:public"])
+
+# Convenience aliases for the host toolchain
+alias(
+    name = "gcc_toolchain",
+    actual = "@host_gcc_repo//:gcc_toolchain",
+)
+
+alias(
+    name = "gcc_toolchain_linux_x86_64",
+    actual = "@host_gcc_repo//:gcc_toolchain_linux_x86_64",
+)
+
+alias(
+    name = "gcc_toolchain_linux_aarch64",
+    actual = "@host_gcc_repo//:gcc_toolchain_linux_aarch64",
+)

@@ -34,3 +34,19 @@ alias(
     name = "centos_gcc_toolchain_linux_aarch64",
     actual = "//centos_gcc:gcc_toolchain_linux_aarch64",
 )
+
+# Convenience aliases to Host toolchain
+alias(
+    name = "host_gcc_toolchain",
+    actual = "//host_gcc:gcc_toolchain",
+)
+
+alias(
+    name = "host_gcc_toolchain_linux_x86_64",
+    actual = "//host_gcc:gcc_toolchain_linux_x86_64",
+)
+
+alias(
+    name = "host_gcc_toolchain_linux_aarch64",
+    actual = "//host_gcc:gcc_toolchain_linux_aarch64",
+)

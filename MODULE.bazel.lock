@@ -167,6 +167,22 @@
         },
         "recordedRepoMappingEntries": []
       }
+    },
+    "//host_gcc:extensions.bzl%host_gcc_extension": {
+      "general": {
+        "bzlTransitiveDigest": "Xa4Fa+80hGk8XGpcBjEDeheUZABIhgqsS8rSGJlty84=",
+        "usagesDigest": "qp5Dpey/VxO0bYJW4It6zcMC/MGgQIMKQvc8swKyDpw=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "host_gcc_repo": {
+            "repoRuleId": "@@//host_gcc:extensions.bzl%host_gcc_toolchain",
+            "attributes": {}
+          }
+        },
+        "recordedRepoMappingEntries": []
+      }
     }
   }
 }
