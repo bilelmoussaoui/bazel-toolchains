@@ -30,8 +30,25 @@ This repository provides isolated GCC toolchains built from Linux distribution R
 ├── host_gcc/
 │   ├── BUILD.bazel          # Host system build file
 │   └── extensions.bzl       # Host GCC toolchain extension
+├── examples/
+│   └── simple_c/            # Simple C example project
+│       ├── BUILD.bazel      # Example build file
+│       ├── MODULE.bazel     # Example module configuration
+│       ├── hello.c          # Example C source code
+│       └── README.md        # Example documentation
 └── README.md                # This file
 ```
+
+## 🚀 Quick Start
+
+Try the example project:
+
+```bash
+cd examples/simple_c
+bazel run //:hello
+```
+
+This will use the host GCC toolchain to build and run a simple C program.
 
 ## 🚀 Usage
 

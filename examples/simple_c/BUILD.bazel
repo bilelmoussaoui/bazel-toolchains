@@ -1,0 +1,12 @@
+# Simple C example using GCC toolchains
+
+cc_binary(
+    name = "hello",
+    srcs = ["hello.c"],
+)
+
+cc_binary(
+    name = "hello_static",
+    srcs = ["hello.c"],
+    linkstatic = True,
+)
