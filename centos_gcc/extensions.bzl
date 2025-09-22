@@ -51,8 +51,8 @@ _PACKAGES_BY_ARCH = {
             "package_dir": "BaseOS"
         },
         "kernel-headers": {
-            "version": "5.14.0-604.el9",
-            "sha256": "1c9b4402c41d06671e6fe1eb50c90d223c97aa9544f0b7be581c4373e7b455ae",
+            "version": "5.14.0-617.el9",
+            "sha256": "8dc4c726537d55bc412733027802d0a0ef57368da044b574f2c921e3b95f6508",
             "package_dir": "AppStream"
         },
         "glibc-headers": {
