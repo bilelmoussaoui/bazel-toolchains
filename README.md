@@ -8,9 +8,6 @@ This repository provides isolated GCC toolchains built from Linux distribution R
 - **Isolated Builds**: RPM-based toolchains with no host system dependencies
 - **Host Integration**: Fast host toolchain using system GCC installation
 - **Architecture Support**: x86_64 and aarch64
-- **Distribution-Specific Flags**: Configurable compiler flags per toolchain
-- **Shared Infrastructure**: Common utilities across all toolchain types
-- **Automated Updates**: Unified script to fetch latest package versions
 
 ## 🏗️ Repository Structure
 
@@ -77,7 +74,7 @@ use_repo(fedora_gcc, "fedora_gcc_repo")
 register_toolchains("@fedora_gcc_repo//:gcc_toolchain_linux_x86_64")
 ```
 
-### Using CentOS GCC Toolchain (when ready)
+### Using CentOS GCC Toolchain
 
 ```python
 bazel_dep(name = "multi_gcc_toolchain", version = "1.0.0")
@@ -120,7 +117,7 @@ Copy the output into the respective `extensions.bzl` file.
 ## ✅ Status
 
 - **Fedora GCC Toolchain**: ✅ Fully functional and tested
-- **CentOS GCC Toolchain**: 🚧 Framework ready, needs package version updates
+- **CentOS GCC Toolchain**: ✅ Fully functional and tested on x86_64
 - **Host GCC Toolchain**: ✅ Fully functional and tested
 
 ## 🎨 Features

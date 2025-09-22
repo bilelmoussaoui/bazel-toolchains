@@ -55,6 +55,11 @@ _PACKAGES_BY_ARCH = {
             "sha256": "1c9b4402c41d06671e6fe1eb50c90d223c97aa9544f0b7be581c4373e7b455ae",
             "package_dir": "AppStream"
         },
+        "glibc-headers": {
+            "version": "2.34-223.el9",
+            "sha256": "28ae01846d8b945b97b402902e7559b725e2f07f193c868756d0fdfe543c2d31",
+            "package_dir": "AppStream"
+        },
     },
     "aarch64": {
         "gcc": {

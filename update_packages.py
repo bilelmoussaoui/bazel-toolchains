@@ -60,7 +60,7 @@ def get_centos_package_info(centos_release: str, arch: str, package_name: str) -
     """
     # Define which packages are in which repository
     baseos_packages = {'binutils', 'libstdc++'}
-    appstream_packages = {'gcc', 'gcc-c++', 'cpp', 'glibc-devel', 'libstdc++-devel', 'kernel-headers'}
+    appstream_packages = {'gcc', 'gcc-c++', 'cpp', 'glibc-devel', 'libstdc++-devel', 'kernel-headers', 'glibc-headers'}
 
     # Determine the correct repository
     if package_name in baseos_packages:
@@ -106,7 +106,7 @@ def get_centos_package_info(centos_release: str, arch: str, package_name: str) -
                         return {
                             'name': package_name,
                             'version': full_version,
-                            'subpath': "",  # No subpath for CentOS
+                            'package_dir': repo,  # BaseOS or AppStream for CentOS
                             'url': download_url,
                             'filename': rpm_filename
                         }
@@ -168,7 +168,13 @@ def output_package_info(packages_info: Dict[str, Dict], arch: str, distro: str) 
         print(f'            "{pkg_name}": {{')
         print(f'                "version": "{info["version"]}",')
         print(f'                "sha256": "{info["sha256"]}",')
-        print(f'                "subpath": "{info["subpath"]}"')
+
+        # Add the appropriate field based on distribution
+        if distro == 'fedora':
+            print(f'                "subpath": "{info["subpath"]}"')
+        elif distro == 'centos':
+            print(f'                "package_dir": "{info["package_dir"]}"')
+
         print(f'            }},')
     print('        },')
 
@@ -220,6 +226,9 @@ def main():
         'libstdc++',
         'kernel-headers'
     ]
+
+    if distro == 'centos':
+        package_names.append('glibc-headers')
 
     packages_info = {}
 
