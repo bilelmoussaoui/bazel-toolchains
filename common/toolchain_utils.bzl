@@ -120,6 +120,7 @@ def download_and_extract_packages(repository_ctx, packages, base_url_template, r
             subpath = subpath,
             pkg_name = package_name,
             version = version,
+            package_dir = info.get("package_dir", "AppStream"), # in the format of Appstream / or BaseOS for Centos
         )
 
         rpm_filename = "{}.rpm".format(package_name)

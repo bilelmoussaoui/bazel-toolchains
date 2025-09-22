@@ -4,7 +4,7 @@ Script to fetch current package versions and SHA256 hashes from Linux distributi
 Supports both Fedora and CentOS. Outputs package information that can be used to update extensions.bzl manually.
 """
 
-import json
+from bs4 import BeautifulSoup
 import re
 import hashlib
 import urllib.request
@@ -56,41 +56,77 @@ def get_fedora_package_info(fedora_release: str, arch: str, package_name: str) -
 def get_centos_package_info(centos_release: str, arch: str, package_name: str) -> Optional[Dict]:
     """
     Query CentOS repositories for package information using directory listing approach.
+    CentOS packages are split between BaseOS and AppStream repositories.
     """
-    base_url = f"https://mirror.stream.centos.org/{centos_release}-stream/AppStream/{arch}/os/Packages"
+    # Define which packages are in which repository
+    baseos_packages = {'binutils', 'libstdc++'}
+    appstream_packages = {'gcc', 'gcc-c++', 'cpp', 'glibc-devel', 'libstdc++-devel', 'kernel-headers'}
 
-    try:
-        # CentOS packages are directly in the Packages directory, no subpath
-        listing_url = f"{base_url}/"
-        request = urllib.request.Request(listing_url)
-        request.add_header('User-Agent', 'Multi-GCC-Toolchain-Updater/1.0')
+    # Determine the correct repository
+    if package_name in baseos_packages:
+        repo = "BaseOS"
+    elif package_name in appstream_packages:
+        repo = "AppStream"
 
-        with urllib.request.urlopen(request) as response:
-            html_content = response.read().decode()
+    base_url = f"https://mirror.stream.centos.org/{centos_release}-stream/{repo}/{arch}/os/Packages"
 
-        # Parse HTML to find package files
-        # CentOS uses .el9 instead of .fc42
-        pattern = rf'{re.escape(package_name)}-([^-]+)-([^-]+)\.el{centos_release}\.{arch}\.rpm'
-        matches = re.findall(pattern, html_content)
+    def try_repository(repo_name, base_url):
+        try:
+            # CentOS packages are directly in the Packages directory, no subpath
+            listing_url = f"{base_url}/"
+            request = urllib.request.Request(listing_url)
+            request.add_header('User-Agent', 'Multi-GCC-Toolchain-Updater/1.0')
 
-        if matches:
-            # Get the latest version (simple sort, may not be perfect)
-            version, release = sorted(matches)[-1]
-            full_version = f"{version}-{release}.el{centos_release}"
+            with urllib.request.urlopen(request) as response:
+                html_content = response.read().decode()
 
-            rpm_filename = f"{package_name}-{full_version}.{arch}.rpm"
-            download_url = f"{base_url}/{rpm_filename}"
+            # Parse HTML to find package files
+            soup = BeautifulSoup(html_content, 'html.parser')
 
-            return {
-                'name': package_name,
-                'version': full_version,
-                'subpath': "",  # No subpath for CentOS
-                'url': download_url,
-                'filename': rpm_filename
-            }
+            # Find all <a> tags that are inside a <td> with the class "indexcolname"
+            links = soup.select('td.indexcolname a')
 
-    except Exception as e:
-        print(f"Error querying CentOS repository for {package_name}: {e}")
+            # Loop through all the found links
+            for link in links:
+                # Get the value of the 'href' attribute
+                filename = link.get('href')
+                # Use a simple regex to check if the filename ends with '.rpm'
+                if filename.endswith(".rpm"):
+                    pattern = rf'^{re.escape(package_name)}-(.*)-([^\-]+)\.el{centos_release}\.{arch}\.rpm$'
+                    matches = re.findall(pattern, filename)
+
+                    if matches:
+                        # Get the latest version (simple sort, may not be perfect)
+                        version, release = sorted(matches)[-1]
+                        full_version = f"{version}-{release}.el{centos_release}"
+
+                        rpm_filename = f"{package_name}-{full_version}.{arch}.rpm"
+                        download_url = f"{base_url}/{rpm_filename}"
+
+                        return {
+                            'name': package_name,
+                            'version': full_version,
+                            'subpath': "",  # No subpath for CentOS
+                            'url': download_url,
+                            'filename': rpm_filename
+                        }
+
+        except Exception as e:
+            print(f"Error querying CentOS {repo_name} repository for {package_name}: {e}")
+
+        return None
+
+    # Try the determined repository first
+    result = try_repository(repo, base_url)
+    if result:
+        return result
+
+    # If not found and we tried AppStream, try BaseOS
+    if repo == "AppStream":
+        base_url = f"https://mirror.stream.centos.org/{centos_release}-stream/BaseOS/{arch}/os/Packages"
+        result = try_repository("BaseOS", base_url)
+        if result:
+            return result
 
     return None
 

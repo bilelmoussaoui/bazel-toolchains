@@ -136,6 +136,22 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
+    "@@multi_gcc_toolchain+//centos_gcc:extensions.bzl%centos_gcc_extension": {
+      "general": {
+        "bzlTransitiveDigest": "FGogySgLTUiddSVWk90JJGf0zPpBjE4z8EiRyFehAxc=",
+        "usagesDigest": "Xc7XFEYFWtDZMM85M564GFjkZhLYcGrey1UG2PR0XZc=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "centos_gcc_repo": {
+            "repoRuleId": "@@multi_gcc_toolchain+//centos_gcc:extensions.bzl%centos_gcc_toolchain",
+            "attributes": {}
+          }
+        },
+        "recordedRepoMappingEntries": []
+      }
+    },
     "@@multi_gcc_toolchain+//fedora_gcc:extensions.bzl%fedora_gcc_extension": {
       "general": {
         "bzlTransitiveDigest": "j1wBFLVotReDLiAQH1beCrvk2AJy42TbCPQElCbs1yY=",
