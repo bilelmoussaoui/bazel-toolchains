@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-toolchains:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [host, fedora, centos]
+        example: [simple_c, external_lib]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        if [ "${{ matrix.toolchain }}" = "host" ]; then
+          # Host toolchain needs system GCC and development libraries
+          sudo apt-get install -y \
+            gcc \
+            g++ \
+            libc6-dev \
+            linux-libc-dev \
+            binutils
+        elif [ "${{ matrix.toolchain }}" = "fedora" ] || [ "${{ matrix.toolchain }}" = "centos" ]; then
+          # Fedora/CentOS toolchains need RPM extraction tools
+          sudo apt-get install -y \
+            rpm2cpio \
+            cpio \
+            curl \
+            ca-certificates \
+            grep
+        fi
+
+    - name: Set up Bazelisk
+      uses: bazelbuild/setup-bazelisk@v3
+
+    - name: Mount bazel cache
+      uses: actions/cache@v4
+      with:
+        path: "~/.cache/bazel"
+        key: bazel-${{ matrix.toolchain }}-${{ matrix.example }}
+
+    - name: Configure toolchain for ${{ matrix.example }}
+      run: |
+        cd examples/${{ matrix.example }}
+
+        # Comment out all toolchains first
+        sed -i 's/^host_gcc = /#host_gcc = /' MODULE.bazel
+        sed -i 's/^use_repo(host_gcc/#use_repo(host_gcc/' MODULE.bazel
+        sed -i 's/^register_toolchains("@host_gcc/#register_toolchains("@host_gcc/' MODULE.bazel
+
+        sed -i 's/^fedora_gcc = /#fedora_gcc = /' MODULE.bazel
+        sed -i 's/^use_repo(fedora_gcc/#use_repo(fedora_gcc/' MODULE.bazel
+        sed -i 's/^register_toolchains("@fedora_gcc/#register_toolchains("@fedora_gcc/' MODULE.bazel
+
+        sed -i 's/^centos_gcc = /#centos_gcc = /' MODULE.bazel
+        sed -i 's/^use_repo(centos_gcc/#use_repo(centos_gcc/' MODULE.bazel
+        sed -i 's/^register_toolchains("@centos_gcc/#register_toolchains("@centos_gcc/' MODULE.bazel
+
+        # Enable the specific toolchain for this test
+        if [ "${{ matrix.toolchain }}" = "host" ]; then
+          sed -i 's/^#host_gcc = /host_gcc = /' MODULE.bazel
+          sed -i 's/^#use_repo(host_gcc/use_repo(host_gcc/' MODULE.bazel
+          sed -i 's/^#register_toolchains("@host_gcc/register_toolchains("@host_gcc/' MODULE.bazel
+        elif [ "${{ matrix.toolchain }}" = "fedora" ]; then
+          sed -i 's/^#fedora_gcc = /fedora_gcc = /' MODULE.bazel
+          sed -i 's/^#use_repo(fedora_gcc/use_repo(fedora_gcc/' MODULE.bazel
+          sed -i 's/^#register_toolchains("@fedora_gcc/register_toolchains("@fedora_gcc/' MODULE.bazel
+        elif [ "${{ matrix.toolchain }}" = "centos" ]; then
+          sed -i 's/^#centos_gcc = /centos_gcc = /' MODULE.bazel
+          sed -i 's/^#use_repo(centos_gcc/use_repo(centos_gcc/' MODULE.bazel
+          sed -i 's/^#register_toolchains("@centos_gcc/register_toolchains("@centos_gcc/' MODULE.bazel
+        fi
+
+        echo "=== MODULE.bazel configuration for ${{ matrix.toolchain }} toolchain ==="
+        cat MODULE.bazel
+
+    - name: Build ${{ matrix.example }} with ${{ matrix.toolchain }} toolchain
+      run: |
+        cd examples/${{ matrix.example }}
+        bazel build //...
+
+    - name: Test ${{ matrix.example }} with ${{ matrix.toolchain }} toolchain
+      run: |
+        cd examples/${{ matrix.example }}
+        # Run the built binary to ensure it works
+        if [ "${{ matrix.example }}" = "simple_c" ]; then
+          ./bazel-bin/hello
+          ./bazel-bin/hello_static arg1 arg2
+        elif [ "${{ matrix.example }}" = "external_lib" ]; then
+          ./bazel-bin/json_demo
+          ./bazel-bin/json_demo_static
+        fi
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install beautifulsoup4
+
+    - name: Check Python script syntax
+      run: |
+        python -m py_compile update_packages.py
+
+    - name: Validate Bazel files
+      uses: bazelbuild/setup-bazelisk@v3
+
+    - name: Check Bazel syntax
+      run: |
+        # Check that all BUILD.bazel and .bzl files are valid
+        bazel query //... > /dev/null
+        find . -name "*.bzl" -exec bazel query --output=build {} \; > /dev/null || true
