@@ -101,8 +101,34 @@ def _centos_gcc_toolchain_impl(repository_ctx):
     # This allows the standard toolchain logic to work without modification
     gcc_toolset_root = "opt/rh/gcc-toolset-14/root"
 
+    # Create directories and copy essential gcc-toolset-14 components to standard locations
+    repository_ctx.execute(["mkdir", "-p", "usr/bin", "usr/lib", "usr/libexec", "usr/include"])
+
+    # Copy GCC internal components (needed for compilation headers like stddef.h)
+    repository_ctx.execute([
+        "cp", "-r",
+        "{}/usr/lib/gcc".format(gcc_toolset_root),
+        "usr/lib/gcc"
+    ])
+    repository_ctx.execute([
+        "cp", "-r",
+        "{}/usr/libexec/gcc".format(gcc_toolset_root),
+        "usr/libexec/gcc"
+    ])
+
+    # Copy gcc-toolset-14 headers to standard location
+    repository_ctx.execute([
+        "bash", "-c",
+        "if [ -d {}/usr/include ]; then cp -r {}/usr/include/* usr/include/ 2>/dev/null || true; fi".format(gcc_toolset_root, gcc_toolset_root)
+    ])
+
+    # Copy C++ headers from gcc-toolset-14 location to standard location
+    repository_ctx.execute([
+        "bash", "-c",
+        "if [ -d {}/usr/include/c++ ]; then mkdir -p usr/include/c++ && cp -r {}/usr/include/c++/* usr/include/c++/ 2>/dev/null || true; fi".format(gcc_toolset_root, gcc_toolset_root)
+    ])
+
     # Create wrapper scripts for gcc-toolset-14 tools to handle library dependencies
-    repository_ctx.execute(["mkdir", "-p", "usr/bin"])
     tools = ["gcc", "g++", "cpp", "ar", "ld", "ld.bfd", "objcopy", "strip", "objdump", "as"]
 
     for tool in tools:
