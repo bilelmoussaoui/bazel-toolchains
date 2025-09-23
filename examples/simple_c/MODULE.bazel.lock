@@ -138,7 +138,7 @@
   "moduleExtensions": {
     "@@multi_gcc_toolchain+//centos_gcc:extensions.bzl%centos_gcc_extension": {
       "general": {
-        "bzlTransitiveDigest": "FGogySgLTUiddSVWk90JJGf0zPpBjE4z8EiRyFehAxc=",
+        "bzlTransitiveDigest": "6fUeozhKjITjKdpQ5s8OCg7/d7DZ/u3K27uKvYtI0/w=",
         "usagesDigest": "Xc7XFEYFWtDZMM85M564GFjkZhLYcGrey1UG2PR0XZc=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -170,7 +170,7 @@
     },
     "@@multi_gcc_toolchain+//host_gcc:extensions.bzl%host_gcc_extension": {
       "general": {
-        "bzlTransitiveDigest": "LBCPtYgs8lK+odFuWKUV7mjCUGdV7Fi2Vl+xBP7Ogy4=",
+        "bzlTransitiveDigest": "2bQNG0VQeNGs5ZthCuVlK69Lgskqu4a5iWTlVUffEDQ=",
         "usagesDigest": "/YHKH28LHiUtpSyTkYuAzL/dH9+IIUwGWr2TKxbOn9E=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},

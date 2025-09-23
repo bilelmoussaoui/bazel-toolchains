@@ -58,19 +58,10 @@ def get_centos_package_info(centos_release: str, arch: str, package_name: str) -
     Query CentOS repositories for package information using directory listing approach.
     CentOS packages are split between BaseOS and AppStream repositories.
     """
-    # Define which packages are in which repository
-    baseos_packages = {'binutils', 'libstdc++'}
-    appstream_packages = {'gcc', 'gcc-c++', 'cpp', 'glibc-devel', 'libstdc++-devel', 'kernel-headers', 'glibc-headers'}
-
     # Determine the correct repository
-    if package_name in baseos_packages:
-        repo = "BaseOS"
-    elif package_name in appstream_packages:
-        repo = "AppStream"
+    base_url = f"https://autosd.sig.centos.org/AutoSD-{centos_release}/nightly/repos/AutoSD/compose/AutoSD/{arch}/os/Packages"
 
-    base_url = f"https://mirror.stream.centos.org/{centos_release}-stream/{repo}/{arch}/os/Packages"
-
-    def try_repository(repo_name, base_url):
+    def try_repository(base_url):
         try:
             # CentOS packages are directly in the Packages directory, no subpath
             listing_url = f"{base_url}/"
@@ -83,13 +74,10 @@ def get_centos_package_info(centos_release: str, arch: str, package_name: str) -
             # Parse HTML to find package files
             soup = BeautifulSoup(html_content, 'html.parser')
 
-            # Find all <a> tags that are inside a <td> with the class "indexcolname"
-            links = soup.select('td.indexcolname a')
-
+            links = soup.select('pre a')
             # Loop through all the found links
             for link in links:
-                # Get the value of the 'href' attribute
-                filename = link.get('href')
+                filename = link.text
                 # Use a simple regex to check if the filename ends with '.rpm'
                 if filename.endswith(".rpm"):
                     pattern = rf'^{re.escape(package_name)}-(.*)-([^\-]+)\.el{centos_release}\.{arch}\.rpm$'
@@ -106,8 +94,7 @@ def get_centos_package_info(centos_release: str, arch: str, package_name: str) -
                         return {
                             'name': package_name,
                             'version': full_version,
-                            'package_dir': repo,  # BaseOS or AppStream for CentOS
-                            'url': download_url,
+                            'url': link.get('href'),
                             'filename': rpm_filename
                         }
 
@@ -117,16 +104,9 @@ def get_centos_package_info(centos_release: str, arch: str, package_name: str) -
         return None
 
     # Try the determined repository first
-    result = try_repository(repo, base_url)
+    result = try_repository(base_url)
     if result:
         return result
-
-    # If not found and we tried AppStream, try BaseOS
-    if repo == "AppStream":
-        base_url = f"https://mirror.stream.centos.org/{centos_release}-stream/BaseOS/{arch}/os/Packages"
-        result = try_repository("BaseOS", base_url)
-        if result:
-            return result
 
     return None
 
@@ -172,8 +152,6 @@ def output_package_info(packages_info: Dict[str, Dict], arch: str, distro: str) 
         # Add the appropriate field based on distribution
         if distro == 'fedora':
             print(f'                "subpath": "{info["subpath"]}"')
-        elif distro == 'centos':
-            print(f'                "package_dir": "{info["package_dir"]}"')
 
         print(f'            }},')
     print('        },')
@@ -228,7 +206,16 @@ def main():
     ]
 
     if distro == 'centos':
-        package_names.append('glibc-headers')
+        # Use gcc-toolset-14 packages for CentOS for modern toolchain
+        package_names = [
+            'gcc-toolset-14-gcc',
+            'gcc-toolset-14-gcc-c++',
+            'glibc-devel',
+            'glibc-headers',  # Essential: contains basic C headers like stdio.h
+            'gcc-toolset-14-libstdc++-devel',
+            'kernel-headers',
+            'gcc-toolset-14-binutils'
+        ]
 
     packages_info = {}
 
