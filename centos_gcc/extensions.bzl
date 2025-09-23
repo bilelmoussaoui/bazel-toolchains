@@ -15,92 +15,59 @@ _CENTOS_RELEASE = "9"
 # Note: CentOS uses different package versions and repository structure
 _PACKAGES_BY_ARCH = {
     "x86_64": {
-        "gcc": {
-            "version": "11.5.0-4.el9",
-            "sha256": "b6fd630a6312e088452e33d255979f486c2e222488d5b4df5c03e4bbdfb8d4e3",
-            "package_dir": "AppStream"
+        "gcc-toolset-14-gcc": {
+            "version": "14.2.1-12.el9",
+            "sha256": "206edfb9e83635884bb1b34db1b5015ca7e223109bcf5099648793acc2a70c07",
         },
-        "gcc-c++": {
-            "version": "11.5.0-4.el9",
-            "sha256": "bcc44ae358b8c7f1e10e520219ce655bcaf49f940c50b7eb88461c6ac764aab4",
-            "package_dir": "AppStream"
-        },
-        "cpp": {
-            "version": "11.5.0-4.el9",
-            "sha256": "1f60e22ef7f53e4819c524d44a73d0dbe54d8a3dc2f985c3294bc18c9f9111fd",
-            "package_dir": "AppStream"
-        },
-        "binutils": {
-            "version": "2.35.2-60.el9",
-            "sha256": "4ee6e13f84fcb44ebeea861296314f8bacff84cfdaa977f1c838b9ffbbf83239",
-            "package_dir": "BaseOS"
+        "gcc-toolset-14-gcc-c++": {
+            "version": "14.2.1-12.el9",
+            "sha256": "cdca57094aad8259e5cbba7553bb7f5b82fe877e51230026c2068361a1d367ea",
         },
         "glibc-devel": {
-            "version": "2.34-223.el9",
-            "sha256": "b381a3b9df065ce9b1e8c4225eae3cd0aa92297550f6c5d830f234f2c1e2d9a6",
-            "package_dir": "AppStream"
-        },
-        "libstdc++-devel": {
-            "version": "11.5.0-4.el9",
-            "sha256": "d99bce7d0ae01d0434a236a7656c8b2469eab52ea1e83e60061c797158cf9869",
-            "package_dir": "AppStream"
-        },
-        "libstdc++": {
-            "version": "11.5.0-4.el9",
-            "sha256": "e377ac4138e761d71d978fba9cfed36f4b6414ab32d43ab167a661883d5ea20d",
-            "package_dir": "BaseOS"
-        },
-        "kernel-headers": {
-            "version": "5.14.0-604.el9",
-            "sha256": "1c9b4402c41d06671e6fe1eb50c90d223c97aa9544f0b7be581c4373e7b455ae",
-            "package_dir": "AppStream"
+            "version": "2.34-232.el9",
+            "sha256": "42e6ad29fc25a5a79635f17be4189950adcddf1e03f3060ab950ae362650c254",
         },
         "glibc-headers": {
-            "version": "2.34-223.el9",
-            "sha256": "28ae01846d8b945b97b402902e7559b725e2f07f193c868756d0fdfe543c2d31",
-            "package_dir": "AppStream"
+            "version": "2.34-232.el9",
+            "sha256": "c400735cbe49a6a3f2d7d9a6cbe3d23e528e7ecb42576598b7fe2a5f75b23411",
+        },
+        "gcc-toolset-14-libstdc++-devel": {
+            "version": "14.2.1-12.el9",
+            "sha256": "bd637e3eb1ac8bdeca0bea59abb733ba029202dfe367f9ae8749ddcd3469bb1c",
+        },
+        "kernel-headers": {
+            "version": "5.14.0-617.el9",
+            "sha256": "8dc4c726537d55bc412733027802d0a0ef57368da044b574f2c921e3b95f6508",
+        },
+        "gcc-toolset-14-binutils": {
+            "version": "2.41-5.el9",
+            "sha256": "ff3f18344de9d15ee5c42892779e6ce0aee5fdc081a080b6afd53da8a17efc07",
         },
     },
     "aarch64": {
-        "gcc": {
-            "version": "11.5.0-4.el9",
-            "sha256": "3e69e9371bd387721701475948363b1b9299b11e3ec39c68327e2efdb10582f7",
-            "package_dir": "AppStream"
+        "gcc-toolset-14-gcc": {
+            "version": "14.2.1-12.el9",
+            "sha256": "6a39e23a024641ce50182a59099724cb4c93ccd759816882c806bef1498cf818",
         },
-        "gcc-c++": {
-            "version": "11.5.0-4.el9",
-            "sha256": "fdd3bffceaefcbf4af9b4949a2e61d8b983a1a8b1337e80b28686f05a0baf696",
-            "package_dir": "AppStream"
-        },
-        "cpp": {
-            "version": "11.5.0-4.el9",
-            "sha256": "19577d2c9b3d51e2b908f1bc63aea2bbeb8d6a2162f7d39553a79e3bce170744",
-            "package_dir": "AppStream"
-        },
-        "binutils": {
-            "version": "2.35.2-60.el9",
-            "sha256": "7a616e06890a1881b5706123076a41871ad9c4ce48007492eb1d7f7c51c63470",
-            "package_dir": "BaseOS"
+        "gcc-toolset-14-gcc-c++": {
+            "version": "14.2.1-12.el9",
+            "sha256": "b494c73ff38f98af54e8d3293f38cea033d8a1bd590f477242e1024a710dd4b2",
         },
         "glibc-devel": {
-            "version": "2.34-223.el9",
-            "sha256": "39fc9464a8df776f244549c8a64cc49e37f75222fe3689b917cd44f6c3968125",
-            "package_dir": "AppStream"
+            "version": "2.34-232.el9",
+            "sha256": "8e3f3aedb10ca4f2d366cb5becbdf3451d9b133f5ed278000da6f68e1b3f71d4",
         },
-        "libstdc++-devel": {
-            "version": "11.5.0-4.el9",
-            "sha256": "a5fcfa0b1eed31a617f48ceab75003e6e9870558543d1c1585e6eee0753d0484",
-            "package_dir": "AppStream"
-        },
-        "libstdc++": {
-            "version": "11.5.0-4.el9",
-            "sha256": "d07ad1e2d0246b626c6636e3f55abd258263caba83795dc41ce00f8ce1ebfdfd",
-            "package_dir": "BaseOS"
+        "gcc-toolset-14-libstdc++-devel": {
+            "version": "14.2.1-12.el9",
+            "sha256": "2380b88a25d3e612008bba55f3634ac83b41aec6080bdc08fed83d6a5df67e49",
         },
         "kernel-headers": {
-            "version": "5.14.0-604.el9",
-            "sha256": "95e85dcff6e5cbe76dba33b79be72c51eaf51fa46aac99262bc5d8f25836c7b7",
-            "package_dir": "AppStream"
+            "version": "5.14.0-617.el9",
+            "sha256": "0f118eeca9c67ad5d9b528502541a37896a76f9ba42dc01195284f43912890fc",
+        },
+        "gcc-toolset-14-binutils": {
+            "version": "2.41-5.el9",
+            "sha256": "cb555545d16fff3fbb1ac78aec3d81aca8b84b8b063abcd387ed31754bb45521",
         },
     },
 }
@@ -127,10 +94,31 @@ def _centos_gcc_toolchain_impl(repository_ctx):
 
     # Use shared download and extraction logic
     # CentOS uses different URL structure than Fedora - no subpath needed
-    base_url_template = "https://mirror.stream.centos.org/{release}-stream/{package_dir}/{arch}/os/Packages/{pkg_name}-{version}.{arch}.rpm"
+    base_url_template = "https://autosd.sig.centos.org/AutoSD-{release}/nightly/repos/AutoSD/compose/AutoSD/{arch}/os/Packages/{pkg_name}-{version}.{arch}.rpm"
     download_and_extract_packages(repository_ctx, packages, base_url_template, _CENTOS_RELEASE, rpm_arch, "CentOS {}".format(_CENTOS_RELEASE))
 
-    # Use shared GCC version detection
+    # Create symbolic links from standard paths to gcc-toolset-14 paths
+    # This allows the standard toolchain logic to work without modification
+    gcc_toolset_root = "opt/rh/gcc-toolset-14/root"
+
+    # Create wrapper scripts for gcc-toolset-14 tools to handle library dependencies
+    repository_ctx.execute(["mkdir", "-p", "usr/bin"])
+    tools = ["gcc", "g++", "cpp", "ar", "ld", "ld.bfd", "objcopy", "strip", "objdump", "as"]
+
+    for tool in tools:
+        # Create a wrapper script that sets LD_LIBRARY_PATH
+        wrapper_content = "#!/bin/bash\n"
+        wrapper_content += "# Wrapper for {} to ensure libraries are found\n".format(tool)
+        wrapper_content += "# Get the directory of this script\n"
+        wrapper_content += "SCRIPT_DIR=\"$(dirname \"$(readlink -f \"$0\")\")\"\n"
+        wrapper_content += "REPO_ROOT=\"$(dirname \"$(dirname \"$SCRIPT_DIR\")\")\"  # Go up from usr/bin to repo root\n"
+        wrapper_content += "TOOLSET_ROOT=\"$REPO_ROOT/{}\"\n".format(gcc_toolset_root)
+        wrapper_content += "export LD_LIBRARY_PATH=\"$TOOLSET_ROOT/usr/lib64:$TOOLSET_ROOT/usr/lib:$LD_LIBRARY_PATH\"\n"
+        wrapper_content += "exec \"$TOOLSET_ROOT/usr/bin/{}\" \"$@\"\n".format(tool)
+
+        repository_ctx.file("usr/bin/{}".format(tool), wrapper_content, executable=True)
+
+    # Use shared GCC version detection (now that gcc is available at usr/bin/gcc)
     gcc_version, gcc_major = detect_gcc_version(repository_ctx)
 
     # Use shared include directory calculation

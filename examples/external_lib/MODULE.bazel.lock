@@ -138,6 +138,22 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
+    "@@multi_gcc_toolchain+//centos_gcc:extensions.bzl%centos_gcc_extension": {
+      "general": {
+        "bzlTransitiveDigest": "6fUeozhKjITjKdpQ5s8OCg7/d7DZ/u3K27uKvYtI0/w=",
+        "usagesDigest": "wzFlR4oSs02Z/q66YUA3e/kxVD1uYCu7gUKfK3AyOXM=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "centos_gcc_repo": {
+            "repoRuleId": "@@multi_gcc_toolchain+//centos_gcc:extensions.bzl%centos_gcc_toolchain",
+            "attributes": {}
+          }
+        },
+        "recordedRepoMappingEntries": []
+      }
+    },
     "@@multi_gcc_toolchain+//fedora_gcc:extensions.bzl%fedora_gcc_extension": {
       "general": {
         "bzlTransitiveDigest": "yH8XYjaQQJhhBluvFzb1/jIZpl2Ig58kfwsc1/90qD4=",
@@ -156,7 +172,7 @@
     },
     "@@multi_gcc_toolchain+//host_gcc:extensions.bzl%host_gcc_extension": {
       "general": {
-        "bzlTransitiveDigest": "Q6zhaST53UWnajmcr5zYccf6zmNTyow5pVgwTlV5ars=",
+        "bzlTransitiveDigest": "2bQNG0VQeNGs5ZthCuVlK69Lgskqu4a5iWTlVUffEDQ=",
         "usagesDigest": "PQzls5g37jZNrMKXonaP+t8Y1UC8O2inaWcQh0PGSYk=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
