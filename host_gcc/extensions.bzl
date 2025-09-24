@@ -60,11 +60,6 @@ def _host_gcc_toolchain_impl(repository_ctx):
     # Detect system include directories
     system_includes = _detect_host_includes(repository_ctx)
 
-    # For host toolchain, we'll use a simplified approach for BUILD file
-    # since the shared generate_build_file expects RPM-style extracted files
-    build_content = _generate_host_build_file(gcc_version, rpm_arch)
-    repository_ctx.file("BUILD.bazel", build_content)
-
     # Define host-specific compiler flags
     host_flags = {
         "c_flags": [
@@ -78,227 +73,37 @@ def _host_gcc_toolchain_impl(repository_ctx):
         ]
     }
 
-    # Use shared toolchain config generation
-    module_names = {
-        "module_name": "multi_gcc_toolchain",
-        "extension_name": "host_gcc_extension",
-        "repo_name": "host_gcc_repo",
-        "distro_name": "host"
-    }
+    # Use BUILD template instead of generating dynamically
+    bazel_cpu = "x86_64" if rpm_arch == "x86_64" else "aarch64"
 
-    # Try to use shared cc_toolchain_config generation with host-specific modifications
-    # For now, we'll keep the custom host version since the shared one expects RPM-style paths
-    config_content = _generate_host_cc_toolchain_config(module_names, host_flags, system_includes, rpm_arch, gcc_version)
-    repository_ctx.file("cc_toolchain_config.bzl", config_content)
+    # Format flag lists for template substitution
+    c_flags_str = ', '.join(['"{}"'.format(flag) for flag in host_flags.get("c_flags", [])])
+    cxx_flags_str = ', '.join(['"{}"'.format(flag) for flag in host_flags.get("cxx_flags", [])])
+    link_flags_str = ', '.join(['"{}"'.format(flag) for flag in host_flags.get("link_flags", [])])
+    include_dirs_str = ', '.join(['"{}"'.format(inc_dir) for inc_dir in system_includes])
 
-def _generate_host_build_file(gcc_version, arch):
-    """Generate BUILD.bazel content for host toolchain."""
-
-    bazel_cpu = "x86_64" if arch == "x86_64" else "aarch64"
-
-    return '''load(":cc_toolchain_config.bzl", "cc_toolchain_config")
-
-package(default_visibility = ["//visibility:public"])
-
-# The host toolchain uses system tools directly
-filegroup(
-    name = "all_files",
-    srcs = [],
-)
-
-filegroup(
-    name = "compiler_files",
-    srcs = [],
-)
-
-filegroup(
-    name = "linker_files",
-    srcs = [],
-)
-
-filegroup(
-    name = "ar_files",
-    srcs = [],
-)
-
-filegroup(
-    name = "objcopy_files",
-    srcs = [],
-)
-
-filegroup(
-    name = "strip_files",
-    srcs = [],
-)
-
-filegroup(
-    name = "empty",
-    srcs = [],
-)
-
-# Toolchain configuration
-cc_toolchain_config(
-    name = "gcc_toolchain_config",
-    gcc_version = "{gcc_version}",
-    target_arch = "{arch}",
-)
-
-# The actual toolchain
-cc_toolchain(
-    name = "gcc_toolchain",
-    all_files = ":empty",
-    ar_files = ":empty",
-    compiler_files = ":empty",
-    dwp_files = ":empty",
-    linker_files = ":empty",
-    objcopy_files = ":empty",
-    strip_files = ":empty",
-    supports_param_files = 1,
-    toolchain_config = ":gcc_toolchain_config",
-)
-
-# Toolchain definition for registration
-toolchain(
-    name = "gcc_toolchain_linux_{arch}",
-    exec_compatible_with = [
-        "@platforms//os:linux",
-        "@platforms//cpu:{bazel_cpu}",
-    ],
-    target_compatible_with = [
-        "@platforms//os:linux",
-        "@platforms//cpu:{bazel_cpu}",
-    ],
-    toolchain = ":gcc_toolchain",
-    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
-)
-'''.format(gcc_version=gcc_version, arch=arch, bazel_cpu=bazel_cpu)
-
-def _generate_host_cc_toolchain_config(module_names, host_flags, system_includes, arch, gcc_version):
-    """Generate cc_toolchain_config.bzl for host toolchain."""
-
-    # Prepare flags using same logic as shared utilities
-    if not host_flags:
-        host_flags = {"c_flags": [], "cxx_flags": [], "link_flags": []}
-
-    c_flags_str = ""
-    if host_flags.get("c_flags"):
-        quoted_flags = ['"{}"'.format(flag) for flag in host_flags["c_flags"]]
-        c_flags_str = ",\n".join([""] + quoted_flags)
-
-    cxx_flags_str = ""
-    if host_flags.get("cxx_flags"):
-        quoted_flags = ['"{}"'.format(flag) for flag in host_flags["cxx_flags"]]
-        cxx_flags_str = ",\n".join([""] + quoted_flags)
-
-    link_flags_str = ""
-    if host_flags.get("link_flags"):
-        quoted_flags = ['"{}"'.format(flag) for flag in host_flags["link_flags"]]
-        link_flags_str = ",\n".join([""] + quoted_flags)
-
-    # Format system includes for Bazel
-    include_dirs_list = []
-    for include_dir in system_includes:
-        include_dirs_list.append('"{}"'.format(include_dir))
-    include_dirs_str = "[" + ", ".join(include_dirs_list) + "]"
-
-    return '''
-load("@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl",
-     "feature", "flag_group", "flag_set", "tool_path")
-load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
-
-def _impl(ctx):
-    tool_paths = [
-        tool_path(name = "gcc", path = "/usr/bin/gcc"),
-        tool_path(name = "g++", path = "/usr/bin/g++"),
-        tool_path(name = "ld", path = "/usr/bin/ld"),
-        tool_path(name = "ar", path = "/usr/bin/ar"),
-        tool_path(name = "cpp", path = "/usr/bin/cpp"),
-        tool_path(name = "gcov", path = "/usr/bin/gcov"),
-        tool_path(name = "nm", path = "/usr/bin/nm"),
-        tool_path(name = "objdump", path = "/usr/bin/objdump"),
-        tool_path(name = "strip", path = "/usr/bin/strip"),
-    ]
-
-    # Compiler flags for host system (similar to shared utilities structure)
-    default_compile_flags = feature(
-        name = "default_compile_flags",
-        enabled = True,
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.c_compile],
-                flag_groups = [
-                    flag_group(
-                        flags = [
-                            "-Wall",
-                            "-Wextra"{c_flags_str},
-                        ],
-                    ),
-                ],
-            ),
-            flag_set(
-                actions = [ACTION_NAMES.cpp_compile],
-                flag_groups = [
-                    flag_group(
-                        flags = [
-                            "-Wall",
-                            "-Wextra"{cxx_flags_str},
-                        ],
-                    ),
-                ],
-            ),
-        ],
+    repository_ctx.template(
+        "BUILD.bazel",
+        Label("@multi_gcc_toolchain//host_gcc:BUILD.bazel.template"),
+        substitutions = {
+            "{GCC_VERSION}": gcc_version,
+            "{TARGET_ARCH}": rpm_arch,
+            "{BAZEL_CPU}": bazel_cpu,
+            "{C_FLAGS}": c_flags_str,
+            "{CXX_FLAGS}": cxx_flags_str,
+            "{LINK_FLAGS}": link_flags_str,
+            "{INCLUDE_DIRS}": include_dirs_str,
+        },
     )
 
-    default_link_flags = feature(
-        name = "default_link_flags",
-        enabled = True,
-        flag_sets = [
-            flag_set(
-                actions = [
-                    ACTION_NAMES.cpp_link_executable,
-                    ACTION_NAMES.cpp_link_dynamic_library,
-                ],
-                flag_groups = [
-                    flag_group(
-                        flags = [
-                            "-lstdc++",
-                            "-lm"{link_flags_str},
-                        ],
-                    ),
-                ],
-            ),
-        ],
+    # Copy static template instead of generating dynamically
+    repository_ctx.template(
+        "cc_toolchain_config.bzl",
+        Label("@multi_gcc_toolchain//host_gcc:cc_toolchain_config.bzl.template"),
+        substitutions = {},  # No substitutions needed - everything is handled via rule attributes
     )
 
-    return cc_common.create_cc_toolchain_config_info(
-        ctx = ctx,
-        features = [default_compile_flags, default_link_flags],
-        cxx_builtin_include_directories = {include_dirs_str},
-        toolchain_identifier = "host-gcc-{{}}".format(ctx.attr.gcc_version),
-        host_system_name = "local",
-        target_system_name = "local",
-        target_cpu = ctx.attr.target_arch,
-        target_libc = "glibc",
-        compiler = "gcc",
-        abi_version = "unknown",
-        abi_libc_version = "unknown",
-        tool_paths = tool_paths,
-    )
 
-cc_toolchain_config = rule(
-    implementation = _impl,
-    attrs = {{
-        "gcc_version": attr.string(mandatory = True),
-        "target_arch": attr.string(mandatory = True),
-    }},
-    provides = [CcToolchainConfigInfo],
-)
-'''.format(
-        c_flags_str=c_flags_str,
-        cxx_flags_str=cxx_flags_str,
-        link_flags_str=link_flags_str,
-        include_dirs_str=include_dirs_str
-    )
 
 # Define the repository rule
 host_gcc_toolchain = repository_rule(
