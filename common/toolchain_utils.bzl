@@ -49,19 +49,20 @@ def get_target_architecture(repository_ctx):
 
     return rpm_arch
 
-def detect_gcc_version(repository_ctx):
-    """Detect GCC version from extracted files.
+def detect_gcc_version(repository_ctx, gcc_path = "./usr/bin/gcc"):
+    """Detect GCC version from a GCC binary.
 
     Args:
         repository_ctx: The repository context provided by Bazel
+        gcc_path: Path to the GCC binary (defaults to extracted RPM path)
 
     Returns:
         Tuple: (gcc_version, gcc_major) where gcc_version is full version and gcc_major is major version
     """
-    # Detect GCC version from the extracted files
+    # Detect GCC version from the specified GCC binary
     gcc_version_result = repository_ctx.execute([
         "bash", "-c",
-        "./usr/bin/gcc --version | head -1 | grep -o '[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+' | head -1"
+        "{} --version | head -1 | grep -o '[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+' | head -1".format(gcc_path)
     ])
 
     if gcc_version_result.return_code == 0 and gcc_version_result.stdout.strip():
@@ -71,12 +72,14 @@ def detect_gcc_version(repository_ctx):
         if not gcc_version:
             fail("Failed to detect GCC version: empty version string")
     else:
-        fail("Failed to detect GCC version from extracted toolchain. Command failed with: {}".format(
-            gcc_version_result.stderr if gcc_version_result.stderr else "No error output"
+        context = "host system" if gcc_path == "gcc" else "extracted toolchain"
+        fail("Failed to detect GCC version from {}. Command failed with: {}".format(
+            context, gcc_version_result.stderr if gcc_version_result.stderr else "No error output"
         ))
 
     gcc_major = gcc_version.split('.')[0]
-    print("Detected GCC version: {}".format(gcc_version))
+    context_msg = "host" if gcc_path == "gcc" else "extracted"
+    print("Detected {} GCC version: {}".format(context_msg, gcc_version))
 
     return gcc_version, gcc_major
 
