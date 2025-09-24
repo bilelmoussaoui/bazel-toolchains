@@ -100,7 +100,7 @@ def _impl(ctx):
         ctx = ctx,
         features = [default_compile_flags, default_link_flags, supports_header_path_normalization],
         cxx_builtin_include_directories = ctx.attr.include_dirs,
-        toolchain_identifier = "fedora-gcc-{}".format(ctx.attr.gcc_version),
+        toolchain_identifier = "{DISTRO_NAME}-gcc-{}".format(ctx.attr.gcc_version),
         host_system_name = "local",
         target_system_name = "local",
         target_cpu = ctx.attr.target_arch,

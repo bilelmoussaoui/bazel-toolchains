@@ -5,8 +5,7 @@ This extension provides an isolated GCC toolchain built from Fedora RPM packages
 """
 
 load("//common:toolchain_utils.bzl", "validate_system_requirements", "get_target_architecture",
-     "detect_gcc_version", "calculate_include_dirs", "download_and_extract_packages",
-     "generate_build_file", "generate_cc_toolchain_config")
+     "detect_gcc_version", "calculate_include_dirs", "download_and_extract_packages")
 
 # Configuration
 _FEDORA_RELEASE = "42"
@@ -161,7 +160,7 @@ def _fedora_gcc_toolchain_impl(repository_ctx):
 
     repository_ctx.template(
         "BUILD.bazel",
-        Label("@multi_gcc_toolchain//fedora_gcc:BUILD.bazel.template"),
+        Label("@multi_gcc_toolchain//common:BUILD.bazel.template"),
         substitutions = {
             "{GCC_VERSION}": gcc_version,
             "{TARGET_ARCH}": rpm_arch,
@@ -173,12 +172,13 @@ def _fedora_gcc_toolchain_impl(repository_ctx):
         },
     )
 
-    # Copy static template instead of generating dynamically
+    # Copy shared template instead of generating dynamically
     repository_ctx.template(
         "cc_toolchain_config.bzl",
-        Label("@multi_gcc_toolchain//fedora_gcc:cc_toolchain_config.bzl.template"),
+        Label("@multi_gcc_toolchain//common:cc_toolchain_config.bzl.template"),
         substitutions = {
             "{REPO_NAME}": "multi_gcc_toolchain++fedora_gcc_extension+fedora_gcc_repo",
+            "{DISTRO_NAME}": "fedora",
         },
     )
 
