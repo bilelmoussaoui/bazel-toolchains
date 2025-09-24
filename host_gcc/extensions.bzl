@@ -5,23 +5,8 @@ This extension provides a GCC toolchain that uses the host system's installed GC
 No external downloads - uses existing system packages.
 """
 
-load("//common:toolchain_utils.bzl", "get_target_architecture")
+load("//common:toolchain_utils.bzl", "get_target_architecture", "detect_gcc_version")
 
-def _detect_host_gcc_version(repository_ctx):
-    """Detect GCC version from host system (similar to shared detect_gcc_version but for host)."""
-    version_result = repository_ctx.execute([
-        "bash", "-c",
-        "gcc --version | head -1 | grep -o '[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+' | head -1"
-    ])
-
-    if version_result.return_code != 0 or not version_result.stdout.strip():
-        fail("Failed to parse GCC version from gcc --version output")
-
-    gcc_version = version_result.stdout.strip()
-    gcc_major = gcc_version.split('.')[0]
-    print("Detected host GCC version: {}".format(gcc_version))
-
-    return gcc_version, gcc_major
 
 def _detect_host_includes(repository_ctx):
     """Detect system include directories."""
@@ -54,8 +39,8 @@ def _host_gcc_toolchain_impl(repository_ctx):
     # Use shared architecture detection
     rpm_arch = get_target_architecture(repository_ctx)
 
-    # Use shared GCC version detection (but skip the dependency on extracted files)
-    gcc_version, gcc_major = _detect_host_gcc_version(repository_ctx)
+    # Use shared GCC version detection for host system
+    gcc_version, gcc_major = detect_gcc_version(repository_ctx, "gcc")
 
     # Detect system include directories
     system_includes = _detect_host_includes(repository_ctx)
