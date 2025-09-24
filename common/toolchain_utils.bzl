@@ -80,23 +80,6 @@ def detect_gcc_version(repository_ctx):
 
     return gcc_version, gcc_major
 
-def calculate_include_dirs(rpm_arch, gcc_major):
-    """Calculate include directories for the toolchain.
-
-    Args:
-        rpm_arch: Target architecture (x86_64 or aarch64)
-        gcc_major: GCC major version
-
-    Returns:
-        List of include directory paths
-    """
-    return [
-        "usr/lib/gcc/{}-redhat-linux/{}/include".format(rpm_arch, gcc_major),
-        "usr/include",
-        "usr/include/c++/{}".format(gcc_major),
-        "usr/include/c++/{}/{}-redhat-linux".format(gcc_major, rpm_arch),
-        "usr/include/c++/{}/backward".format(gcc_major),
-    ]
 
 def download_and_extract_packages(repository_ctx, packages, base_url_template, release, rpm_arch, repo_name):
     """Download and extract RPM packages.

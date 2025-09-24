@@ -5,7 +5,7 @@ This extension provides an isolated GCC toolchain built from CentOS RPM packages
 """
 
 load("//common:toolchain_utils.bzl", "validate_system_requirements", "get_target_architecture",
-     "detect_gcc_version", "calculate_include_dirs", "download_and_extract_packages")
+     "detect_gcc_version", "download_and_extract_packages")
 
 # Configuration
 _CENTOS_RELEASE = "9"
@@ -146,9 +146,6 @@ def _centos_gcc_toolchain_impl(repository_ctx):
     # Use shared GCC version detection (now that gcc is available at usr/bin/gcc)
     gcc_version, gcc_major = detect_gcc_version(repository_ctx)
 
-    # Use shared include directory calculation
-    include_dirs = calculate_include_dirs(rpm_arch, gcc_major)
-
     # Define CentOS-specific compiler flags
     centos_flags = {
         "c_flags": [
@@ -172,19 +169,18 @@ def _centos_gcc_toolchain_impl(repository_ctx):
     c_flags_str = ', '.join(['"{}"'.format(flag) for flag in centos_flags.get("c_flags", [])])
     cxx_flags_str = ', '.join(['"{}"'.format(flag) for flag in centos_flags.get("cxx_flags", [])])
     link_flags_str = ', '.join(['"{}"'.format(flag) for flag in centos_flags.get("link_flags", [])])
-    include_dirs_str = ', '.join(['"{}"'.format(inc_dir) for inc_dir in include_dirs])
 
     repository_ctx.template(
         "BUILD.bazel",
         Label("@multi_gcc_toolchain//common:BUILD.bazel.template"),
         substitutions = {
             "{GCC_VERSION}": gcc_version,
+            "{GCC_MAJOR}": gcc_major,
             "{TARGET_ARCH}": rpm_arch,
             "{BAZEL_CPU}": bazel_cpu,
             "{C_FLAGS}": c_flags_str,
             "{CXX_FLAGS}": cxx_flags_str,
             "{LINK_FLAGS}": link_flags_str,
-            "{INCLUDE_DIRS}": include_dirs_str,
         },
     )
 
