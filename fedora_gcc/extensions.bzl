@@ -129,10 +129,6 @@ def _fedora_gcc_toolchain_impl(repository_ctx):
     # Use shared include directory calculation
     include_dirs = calculate_include_dirs(rpm_arch, gcc_major)
 
-    # Use shared BUILD file generation
-    build_content = generate_build_file(gcc_version, include_dirs, rpm_arch)
-    repository_ctx.file("BUILD.bazel", build_content)
-
     # Define Fedora-specific compiler flags
     fedora_flags = {
         "c_flags": [
@@ -154,14 +150,37 @@ def _fedora_gcc_toolchain_impl(repository_ctx):
         ]
     }
 
-    # Use shared toolchain config generation
-    module_names = {
-        "module_name": "multi_gcc_toolchain",
-        "extension_name": "fedora_gcc_extension",
-        "repo_name": "fedora_gcc_repo",
-        "distro_name": "fedora"
-    }
-    repository_ctx.file("cc_toolchain_config.bzl", generate_cc_toolchain_config(module_names, fedora_flags))
+    # Use BUILD template instead of generating dynamically
+    bazel_cpu = "x86_64" if rpm_arch == "x86_64" else "aarch64"
+
+    # Format flag lists for template substitution
+    c_flags_str = ', '.join(['"{}"'.format(flag) for flag in fedora_flags.get("c_flags", [])])
+    cxx_flags_str = ', '.join(['"{}"'.format(flag) for flag in fedora_flags.get("cxx_flags", [])])
+    link_flags_str = ', '.join(['"{}"'.format(flag) for flag in fedora_flags.get("link_flags", [])])
+    include_dirs_str = ', '.join(['"{}"'.format(inc_dir) for inc_dir in include_dirs])
+
+    repository_ctx.template(
+        "BUILD.bazel",
+        Label("@multi_gcc_toolchain//fedora_gcc:BUILD.bazel.template"),
+        substitutions = {
+            "{GCC_VERSION}": gcc_version,
+            "{TARGET_ARCH}": rpm_arch,
+            "{BAZEL_CPU}": bazel_cpu,
+            "{C_FLAGS}": c_flags_str,
+            "{CXX_FLAGS}": cxx_flags_str,
+            "{LINK_FLAGS}": link_flags_str,
+            "{INCLUDE_DIRS}": include_dirs_str,
+        },
+    )
+
+    # Copy static template instead of generating dynamically
+    repository_ctx.template(
+        "cc_toolchain_config.bzl",
+        Label("@multi_gcc_toolchain//fedora_gcc:cc_toolchain_config.bzl.template"),
+        substitutions = {
+            "{REPO_NAME}": "multi_gcc_toolchain++fedora_gcc_extension+fedora_gcc_repo",
+        },
+    )
 
 # Define the repository rule
 fedora_gcc_toolchain = repository_rule(
