@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -13,17 +13,18 @@ jobs:
       fail-fast: false
       matrix:
         toolchain: [host, fedora, centos]
-        example: [simple_c, external_lib]
+        example: [simple_c, external_lib, custom_flags]
 
     steps:
     - uses: actions/checkout@v4
 
     - name: Install system dependencies
       run: |
-        sudo apt-get update
+        sudo add-apt-repository universe
+        sudo apt update
         if [ "${{ matrix.toolchain }}" = "host" ]; then
           # Host toolchain needs system GCC and development libraries
-          sudo apt-get install -y \
+          sudo apt install -y \
             gcc \
             g++ \
             libc6-dev \
@@ -31,7 +32,7 @@ jobs:
             binutils
         elif [ "${{ matrix.toolchain }}" = "fedora" ] || [ "${{ matrix.toolchain }}" = "centos" ]; then
           # Fedora/CentOS toolchains need RPM extraction tools
-          sudo apt-get install -y \
+          sudo apt install -y \
             rpm2cpio \
             cpio \
             curl \
@@ -48,45 +49,10 @@ jobs:
         path: "~/.cache/bazel"
         key: bazel-${{ matrix.toolchain }}-${{ matrix.example }}
 
-    - name: Configure toolchain for ${{ matrix.example }}
-      run: |
-        cd examples/${{ matrix.example }}
-
-        # Comment out all toolchains first
-        sed -i 's/^host_gcc = /#host_gcc = /' MODULE.bazel
-        sed -i 's/^use_repo(host_gcc/#use_repo(host_gcc/' MODULE.bazel
-        sed -i 's/^register_toolchains("@host_gcc/#register_toolchains("@host_gcc/' MODULE.bazel
-
-        sed -i 's/^fedora_gcc = /#fedora_gcc = /' MODULE.bazel
-        sed -i 's/^use_repo(fedora_gcc/#use_repo(fedora_gcc/' MODULE.bazel
-        sed -i 's/^register_toolchains("@fedora_gcc/#register_toolchains("@fedora_gcc/' MODULE.bazel
-
-        sed -i 's/^centos_gcc = /#centos_gcc = /' MODULE.bazel
-        sed -i 's/^use_repo(centos_gcc/#use_repo(centos_gcc/' MODULE.bazel
-        sed -i 's/^register_toolchains("@centos_gcc/#register_toolchains("@centos_gcc/' MODULE.bazel
-
-        # Enable the specific toolchain for this test
-        if [ "${{ matrix.toolchain }}" = "host" ]; then
-          sed -i 's/^#host_gcc = /host_gcc = /' MODULE.bazel
-          sed -i 's/^#use_repo(host_gcc/use_repo(host_gcc/' MODULE.bazel
-          sed -i 's/^#register_toolchains("@host_gcc/register_toolchains("@host_gcc/' MODULE.bazel
-        elif [ "${{ matrix.toolchain }}" = "fedora" ]; then
-          sed -i 's/^#fedora_gcc = /fedora_gcc = /' MODULE.bazel
-          sed -i 's/^#use_repo(fedora_gcc/use_repo(fedora_gcc/' MODULE.bazel
-          sed -i 's/^#register_toolchains("@fedora_gcc/register_toolchains("@fedora_gcc/' MODULE.bazel
-        elif [ "${{ matrix.toolchain }}" = "centos" ]; then
-          sed -i 's/^#centos_gcc = /centos_gcc = /' MODULE.bazel
-          sed -i 's/^#use_repo(centos_gcc/use_repo(centos_gcc/' MODULE.bazel
-          sed -i 's/^#register_toolchains("@centos_gcc/register_toolchains("@centos_gcc/' MODULE.bazel
-        fi
-
-        echo "=== MODULE.bazel configuration for ${{ matrix.toolchain }} toolchain ==="
-        cat MODULE.bazel
-
     - name: Build ${{ matrix.example }} with ${{ matrix.toolchain }} toolchain
       run: |
         cd examples/${{ matrix.example }}
-        bazel build //...
+        bazel build //... --extra_toolchains=@${{ matrix.toolchain }}_gcc_repo//:gcc_toolchain_linux_x86_64 --sandbox_debug --verbose_failures
 
     - name: Test ${{ matrix.example }} with ${{ matrix.toolchain }} toolchain
       run: |
@@ -98,6 +64,9 @@ jobs:
         elif [ "${{ matrix.example }}" = "external_lib" ]; then
           ./bazel-bin/json_demo
           ./bazel-bin/json_demo_static
+        elif [ "${{ matrix.example }}" = "custom_flags" ]; then
+          ./bazel-bin/custom_flags_demo
+          ./bazel-bin/custom_flags_demo_cpp
         fi
 
   lint:

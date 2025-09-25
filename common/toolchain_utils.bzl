@@ -11,7 +11,7 @@ def validate_system_requirements(repository_ctx):
         repository_ctx: The repository context provided by Bazel
     """
     # Early validation of required system tools
-    for tool in ["rpm2cpio", "cpio", "bash", "grep"]:
+    for tool in ["rpm2cpio", "cpio", "bash", "grep", "patchelf"]:
         result = repository_ctx.execute(["which", tool])
         if result.return_code != 0:
             fail("Required tool '{}' is not available in PATH. Please install it before using this toolchain.".format(tool))
@@ -23,6 +23,11 @@ def validate_system_requirements(repository_ctx):
         rpm2cpio_test2 = repository_ctx.execute(["rpm2cpio"])
         if rpm2cpio_test2.return_code not in [0, 1, 2]:
             fail("rpm2cpio tool is not working properly. Please ensure rpm2cpio is installed and functional.")
+
+    # Validate patchelf works
+    patchelf_test = repository_ctx.execute(["patchelf", "--version"])
+    if patchelf_test.return_code != 0:
+        fail("patchelf tool is not working properly. Please ensure patchelf is installed and functional.")
 
 def get_target_architecture(repository_ctx):
     """Get the target architecture, mapping Bazel arch names to RPM arch names.
@@ -133,5 +138,50 @@ def download_and_extract_packages(repository_ctx, packages, base_url_template, r
 
         if result.return_code != 0:
             fail("Failed to extract {}: {}".format(rpm_filename, result.stderr))
+
+    # Patch tools to set RPATH for finding shared libraries
+    patch_tool_rpath(repository_ctx)
+
+def patch_tool_rpath(repository_ctx):
+    """Patch tools to find their shared libraries using RPATH.
+
+    Args:
+        repository_ctx: The repository context provided by Bazel
+    """
+    # Tools that need patched to find their shared libraries
+    tools_to_patch = ["as", "ld"]
+
+    for tool in tools_to_patch:
+        original_tool = "usr/bin/{}".format(tool)
+
+        if repository_ctx.path(original_tool).exists:
+            print("Patching RPATH for {}".format(tool))
+
+            # Create a separate directory with only the libraries we need (not glibc)
+            lib_dir = "usr/lib64/toolchain"
+            repository_ctx.execute(["mkdir", "-p", lib_dir])
+
+            # Copy libraries needed by binutils tools (not glibc)
+            for lib_pattern in ["libbfd*.so*", "libopcodes*.so*", "libz.so*", "libjansson.so*", "libstdc++.so*", "libgcc_s.so*"]:
+                repository_ctx.execute(["bash", "-c", "cp usr/lib64/{} {} 2>/dev/null || true".format(lib_pattern, lib_dir)])
+
+            # Backup the original tool before patching
+            backup_tool = original_tool + ".backup"
+            repository_ctx.execute(["cp", original_tool, backup_tool])
+
+            # Set RPATH to point to our selective library directory
+            result = repository_ctx.execute(["patchelf", "--set-rpath", "$ORIGIN/../lib64/toolchain", original_tool])
+            if result.return_code == 0:
+                # Verify the tool still works after patching
+                test_result = repository_ctx.execute([original_tool, "--version"])
+                if test_result.return_code == 0:
+                    print("Successfully patched RPATH for {} with selective libraries".format(tool))
+                else:
+                    print("Warning: {} failed after RPATH patching, restoring backup".format(tool))
+                    repository_ctx.execute(["mv", backup_tool, original_tool])
+            else:
+                print("Warning: Failed to patch RPATH for {}: {}. Restoring backup.".format(tool, result.stderr))
+                repository_ctx.execute(["mv", backup_tool, original_tool])
+
 
 
