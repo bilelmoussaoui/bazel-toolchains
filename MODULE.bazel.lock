@@ -138,7 +138,7 @@
   "moduleExtensions": {
     "//centos_gcc:extensions.bzl%centos_gcc_extension": {
       "general": {
-        "bzlTransitiveDigest": "FGogySgLTUiddSVWk90JJGf0zPpBjE4z8EiRyFehAxc=",
+        "bzlTransitiveDigest": "7kjj6zDy5MuBZlSLIdlirKKtCSpyZe1coDsPKQTYsJI=",
         "usagesDigest": "QhA0TwMzVVXHLjA54ImVjGPahNMUNainp1TEC7Gr/zc=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},

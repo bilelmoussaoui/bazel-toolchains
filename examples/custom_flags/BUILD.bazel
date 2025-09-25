@@ -1,0 +1,13 @@
+"""BUILD file for custom flags example"""
+
+# Simple C program to test custom flags
+cc_binary(
+    name = "custom_flags_demo",
+    srcs = ["main.c"],
+)
+
+# C++ program to test C++ specific flags
+cc_binary(
+    name = "custom_flags_demo_cpp",
+    srcs = ["main.cpp"],
+)
