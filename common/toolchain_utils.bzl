@@ -85,15 +85,28 @@ def detect_gcc_version(repository_ctx, gcc_path = "./usr/bin/gcc"):
 
 
 def download_and_extract_packages(repository_ctx, packages, base_url_template, release, rpm_arch, repo_name):
-    """Download and extract RPM packages.
+    """Download and extract RPM packages, then set up a complete isolated toolchain environment.
+
+    This function performs the core package extraction and then applies several critical
+    transformations to create a self-contained, Bazel-compatible toolchain.
+
+    Basic functionality:
+    - Downloads RPM packages from the specified repository
+    - Extracts them using rpm2cpio and cpio
+    - Verifies successful extraction
+
+    Advanced isolation setup:
+    - Creates toolchain runtime library directory with LD_LIBRARY_PATH wrappers
+    - Sets up sysroot directory structure for --sysroot flag compatibility
+    - Wraps all toolchain binaries to ensure they find their dependencies
 
     Args:
         repository_ctx: The repository context provided by Bazel
-        packages: Dictionary of package info
+        packages: Dictionary of package info with version, subpath, sha256
         base_url_template: URL template for downloads (with placeholders)
-        release: Distribution release version
-        rpm_arch: Target architecture
-        repo_name: Repository name for error messages
+        release: Distribution release version (e.g., "42")
+        rpm_arch: Target architecture (e.g., "x86_64")
+        repo_name: Repository name for error messages and logging
     """
     print("Downloading {} toolchain for {}".format(repo_name, rpm_arch))
 
@@ -133,5 +146,105 @@ def download_and_extract_packages(repository_ctx, packages, base_url_template, r
 
         if result.return_code != 0:
             fail("Failed to extract {}: {}".format(rpm_filename, result.stderr))
+
+    # ==================================================================================
+    # TOOLCHAIN RUNTIME DEPENDENCIES SETUP
+    # ==================================================================================
+    # Create a dedicated directory for toolchain-specific runtime libraries.
+    # These are libraries that the toolchain tools themselves need to run (not target libraries).
+    #
+    # Problem: Extracted toolchain binaries (gcc, ld, etc.) depend on specific versions
+    # of libraries like libbfd, libopcodes that may not exist or be compatible on the host.
+    # Solution: Create a controlled library directory with only the needed libraries
+    # and use wrapper scripts to set LD_LIBRARY_PATH.
+    repository_ctx.execute(["mkdir", "-p", "usr/lib64/toolchain"])
+
+    # Symlink only the essential libraries needed by toolchain binaries themselves
+    # (not libraries for compiling user code - those go in the sysroot)
+    toolchain_libs = ["libbfd*.so*", "libopcodes*.so*", "libmpc.so*", "libgmp.so*", "libmpfr.so*"]
+    for lib_pattern in toolchain_libs:
+        repository_ctx.execute([
+            "bash", "-c",
+            "for lib in usr/lib64/{}; do [ -f \"$lib\" ] && ln -sf \"../$(basename \"$lib\")\" usr/lib64/toolchain/; done".format(lib_pattern)
+        ])
+
+    # ==================================================================================
+    # SYSROOT DIRECTORY STRUCTURE CREATION
+    # ==================================================================================
+    # Create a proper sysroot directory layout for --sysroot flag compatibility.
+    #
+    # Problem: The --sysroot flag tells the compiler/linker to look for libraries and
+    # headers relative to a root directory. GCC expects libraries in /lib64 and /lib
+    # relative to the sysroot, but our extracted RPM packages place them in /usr/lib64
+    # and /usr/lib.
+    #
+    # Solution: Create symlinks from the expected sysroot paths (/lib64, /lib) to the
+    # actual extracted library locations (/usr/lib64, /usr/lib). This allows the
+    # --sysroot flag to work correctly while preserving the original RPM structure.
+    #
+    # Critical for: Static linking, which requires access to .a files like libc_nonshared.a
+
+    # Create symlinks for all files in usr/lib64 -> lib64
+    lib64_result = repository_ctx.execute(["find", "usr/lib64", "-type", "f"])
+    if lib64_result.return_code == 0:
+        for file_path in lib64_result.stdout.strip().split('\n'):
+            if file_path:  # Skip empty lines
+                filename = file_path.split('/')[-1]  # Get just the filename
+                target_path = "lib64/{}".format(filename)
+                if not repository_ctx.path(target_path).exists:
+                    repository_ctx.symlink(file_path, target_path)
+
+    # Create symlinks for all files in usr/lib -> lib
+    lib_result = repository_ctx.execute(["find", "usr/lib", "-type", "f"])
+    if lib_result.return_code == 0:
+        for file_path in lib_result.stdout.strip().split('\n'):
+            if file_path:  # Skip empty lines
+                filename = file_path.split('/')[-1]  # Get just the filename
+                target_path = "lib/{}".format(filename)
+                if not repository_ctx.path(target_path).exists:
+                    repository_ctx.symlink(file_path, target_path)
+
+
+    # ==================================================================================
+    # TOOLCHAIN BINARY WRAPPER CREATION
+    # ==================================================================================
+    # Create wrapper scripts for all toolchain binaries to ensure they can find their
+    # runtime dependencies.
+    #
+    # Problem: The extracted toolchain binaries (gcc, ld, etc.) were compiled against
+    # specific versions of libraries (libbfd, libopcodes, etc.) that may not exist or
+    # be compatible on the host system. Without proper LD_LIBRARY_PATH, these tools
+    # will fail to run.
+    #
+    # Solution: Create wrapper scripts that:
+    # 1. Set LD_LIBRARY_PATH to point to our controlled toolchain library directory
+    # 2. Execute the original binary with all arguments passed through
+    # 3. Use relative paths to work regardless of where Bazel extracts the repository
+    #
+    # This ensures toolchain isolation and prevents conflicts with host system libraries.
+
+    tools = ["gcc", "g++", "cpp", "ar", "ld", "ld.bfd", "objcopy", "strip", "objdump", "as", "nm", "gcov"]
+
+    for tool in tools:
+        tool_path = "usr/bin/{}".format(tool)
+        wrapper_path = "usr/bin/{}_wrapper".format(tool)
+
+        # Check if the tool exists before creating a wrapper (some tools may not be in all packages)
+        if repository_ctx.path(tool_path).exists:
+            wrapper_content = """#!/bin/bash
+# Wrapper for {} to set library path for extracted toolchain
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+REPO_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
+# Only add specific toolchain libraries, not the entire lib directory
+export LD_LIBRARY_PATH="$REPO_ROOT/usr/lib64/toolchain:$LD_LIBRARY_PATH"
+exec "$REPO_ROOT/usr/bin/{}_original" "$@"
+""".format(tool, tool)
+
+            repository_ctx.file(wrapper_path, wrapper_content, executable=True)
+
+            # Replace the original tool with the wrapper
+            repository_ctx.execute(["mv", tool_path, "{}_original".format(tool_path)])
+            repository_ctx.execute(["mv", wrapper_path, tool_path])
+
 
 

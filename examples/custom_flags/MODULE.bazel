@@ -29,38 +29,30 @@ host_gcc.configure(
     cxx_flags = ["-DCUSTOM_DEFINE=1"],
 )
 
-use_repo(host_gcc, "host_gcc_repo")      # Uncomment if using host
-register_toolchains("@host_gcc_repo//:gcc_toolchain_linux_x86_64")    # Uncomment if using host
-
+use_repo(host_gcc, "host_gcc_repo")
 
 # Configure Fedora toolchain with custom flags
-# fedora_gcc = use_extension("@multi_gcc_toolchain//fedora_gcc:extensions.bzl", "fedora_gcc_extension")
-# 
-# # Example 1: Custom optimization and debug flags
-# fedora_gcc.configure(
-#     c_flags = ["-O3", "-DNDEBUG", "-march=native"],
-#     cxx_flags = ["-O3", "-DNDEBUG", "-march=native", "-std=c++17"],
-#     link_flags = ["-flto", "-s"],
-# )
-# 
-# # Example 2: Additional flags (these will be merged with the above)
-# fedora_gcc.configure(
-#     c_flags = ["-DCUSTOM_DEFINE=1"],
-#     cxx_flags = ["-DCUSTOM_DEFINE=1"],
-# )
-# use_repo(fedora_gcc, "fedora_gcc_repo")
-# register_toolchains("@fedora_gcc_repo//:gcc_toolchain_linux_x86_64")
+fedora_gcc = use_extension("@multi_gcc_toolchain//fedora_gcc:extensions.bzl", "fedora_gcc_extension")
+fedora_gcc.configure(
+    c_flags = ["-O3", "-DNDEBUG", "-march=native"],
+    cxx_flags = ["-O3", "-DNDEBUG", "-march=native", "-std=c++17"],
+    link_flags = ["-flto", "-s"],
+)
+fedora_gcc.configure(
+    c_flags = ["-DCUSTOM_DEFINE=1"],
+    cxx_flags = ["-DCUSTOM_DEFINE=1"],
+)
+use_repo(fedora_gcc, "fedora_gcc_repo")
 
 # Configure CentOS toolchain with custom flags
-# centos_gcc = use_extension("@multi_gcc_toolchain//centos_gcc:extensions.bzl", "centos_gcc_extension")
-# centos_gcc.configure(
-#     c_flags = ["-O3", "-DNDEBUG", "-march=native"],
-#     cxx_flags = ["-O3", "-DNDEBUG", "-march=native", "-std=c++17"],
-#     link_flags = ["-flto", "-s"],
-# )
-# centos_gcc.configure(
-#     c_flags = ["-DCUSTOM_DEFINE=1"],
-#     cxx_flags = ["-DCUSTOM_DEFINE=1"],
-# )
-# use_repo(centos_gcc, "centos_gcc_repo")  # Uncomment if using CentOS
-# register_toolchains("@centos_gcc_repo//:gcc_toolchain_linux_x86_64")  # Uncomment if using CentOS
+centos_gcc = use_extension("@multi_gcc_toolchain//centos_gcc:extensions.bzl", "centos_gcc_extension")
+centos_gcc.configure(
+    c_flags = ["-O3", "-DNDEBUG", "-march=native"],
+    cxx_flags = ["-O3", "-DNDEBUG", "-march=native", "-std=c++17"],
+    link_flags = ["-flto", "-s"],
+)
+centos_gcc.configure(
+    c_flags = ["-DCUSTOM_DEFINE=1"],
+    cxx_flags = ["-DCUSTOM_DEFINE=1"],
+)
+use_repo(centos_gcc, "centos_gcc_repo")

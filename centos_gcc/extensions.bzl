@@ -8,66 +8,119 @@ load("//common:toolchain_utils.bzl", "validate_system_requirements", "get_target
      "detect_gcc_version", "download_and_extract_packages")
 
 # Configuration
-_CENTOS_RELEASE = "9"
+_CENTOS_RELEASE = "10"
 
 # Essential packages for a complete GCC toolchain - organized by architecture
 # Note: CentOS uses different package versions and repository structure
 _PACKAGES_BY_ARCH = {
     "x86_64": {
-        "gcc-toolset-14-gcc": {
-            "version": "14.2.1-12.el9",
-            "sha256": "206edfb9e83635884bb1b34db1b5015ca7e223109bcf5099648793acc2a70c07",
+        "gcc": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "3e6df20e46bc865078ea82707459405863f0969f82f3e7bc1f59eafa5acbf47d",
         },
-        "gcc-toolset-14-gcc-c++": {
-            "version": "14.2.1-12.el9",
-            "sha256": "cdca57094aad8259e5cbba7553bb7f5b82fe877e51230026c2068361a1d367ea",
+        "gcc-c++": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "59f34694a0729f483e875bb57974fcd49afb09690edba1377f991fb0a57ae0b9",
+        },
+        "cpp": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "3e162eb077cc33d8664a97b9c45c314e64ff06d7821a354b7a6782cb41266283",
+        },
+        "binutils": {
+            "version": "2.41-58.el10",
+            "sha256": "2deab9e4aa6fe34dea2d6e312c4a6d48a02288e627e94594b497397365e50712",
         },
         "glibc-devel": {
-            "version": "2.34-232.el9",
-            "sha256": "42e6ad29fc25a5a79635f17be4189950adcddf1e03f3060ab950ae362650c254",
+            "version": "2.39-65.el10",
+            "sha256": "9f9dac005fe4a0c6d9c9d1a61c5b899873dd693bf975e458e99a2faef98ef4dc",
         },
-        "glibc-headers": {
-            "version": "2.34-232.el9",
-            "sha256": "c400735cbe49a6a3f2d7d9a6cbe3d23e528e7ecb42576598b7fe2a5f75b23411",
+        "libstdc++-devel": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "ba6188f734d3790b4eb103eea64680d4488d093bedfcc861dae6c20e77897576",
         },
-        "gcc-toolset-14-libstdc++-devel": {
-            "version": "14.2.1-12.el9",
-            "sha256": "bd637e3eb1ac8bdeca0bea59abb733ba029202dfe367f9ae8749ddcd3469bb1c",
+        "libstdc++": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "7354b93fde7d2048cee214534462f5d01fb6f772cc80b3740296dd54b2b551e6",
         },
         "kernel-headers": {
-            "version": "5.14.0-617.el9",
-            "sha256": "8dc4c726537d55bc412733027802d0a0ef57368da044b574f2c921e3b95f6508",
+            "version": "6.12.0-135.el10",
+            "sha256": "54d5e6870faae2510995ac982421c12ee19b610682de15bc3ddb6465ebf576a3",
         },
-        "gcc-toolset-14-binutils": {
-            "version": "2.41-5.el9",
-            "sha256": "ff3f18344de9d15ee5c42892779e6ce0aee5fdc081a080b6afd53da8a17efc07",
+        "glibc": {
+            "version": "2.39-65.el10",
+            "sha256": "03f6918fdf323779382a549e62f853f5e5d8ecafacf9f992fe362e9a86886616",
+        },
+        "libgcc": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "7ac815d3fff13c6254f82c4703e1f97063bf6246a8b41c34eb96d58d42f3462b",
+        },
+        "libmpc": {
+            "version": "1.3.1-7.el10",
+            "sha256": "daaa73a35dfe21a8201581e333b79ccd296ae87a93f9796ba522e58edc23777c",
+        },
+        "gmp": {
+            "version": "6.2.1-12.el10",
+            "sha256": "6678824b5d45f9b66e8bfeb8f32736e0d710e3b38531a85548f55702d96b63a8",
+        },
+        "mpfr": {
+            "version": "4.2.1-5.el10",
+            "sha256": "a70bc74bde41c17df2d789ffc2a3c3034e1203c6a6c50e6133994f130d23e6bb",
         },
     },
     "aarch64": {
-        "gcc-toolset-14-gcc": {
-            "version": "14.2.1-12.el9",
-            "sha256": "6a39e23a024641ce50182a59099724cb4c93ccd759816882c806bef1498cf818",
+        "gcc": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "7bc956fbce76bd85659de562e0d7c32d2938eeec82dd1aa2679a8e3670fd177c",
         },
-        "gcc-toolset-14-gcc-c++": {
-            "version": "14.2.1-12.el9",
-            "sha256": "b494c73ff38f98af54e8d3293f38cea033d8a1bd590f477242e1024a710dd4b2",
+        "gcc-c++": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "6774dbdc312d7b9a1c8dff3901d4e8c467da6d1a9df501f3fda1a829040aa665",
+        },
+        "cpp": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "ce16b5946d6a4bdd1bf06d1ef44753449425facbf522c32cb2223e7c222305b4",
+        },
+        "binutils": {
+            "version": "2.41-58.el10",
+            "sha256": "5cda10bb09dba160cbfd8f629eb308bcb203df2468821afb1c2b51aed45cd8a7",
         },
         "glibc-devel": {
-            "version": "2.34-232.el9",
-            "sha256": "8e3f3aedb10ca4f2d366cb5becbdf3451d9b133f5ed278000da6f68e1b3f71d4",
+            "version": "2.39-65.el10",
+            "sha256": "dfb688da246848a7a8e38be59b1e828794e190ca14a4a168ed215e20ff963832",
         },
-        "gcc-toolset-14-libstdc++-devel": {
-            "version": "14.2.1-12.el9",
-            "sha256": "2380b88a25d3e612008bba55f3634ac83b41aec6080bdc08fed83d6a5df67e49",
+        "libstdc++-devel": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "2315d11ff83989759d92115774924524a8bfa880daa3357d9155ed52d8578a70",
+        },
+        "libstdc++": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "f5040f18ff5ad47dd7c39b08d82172c6fb69c37590c5a01fba3cfa294698f92c",
         },
         "kernel-headers": {
-            "version": "5.14.0-617.el9",
-            "sha256": "0f118eeca9c67ad5d9b528502541a37896a76f9ba42dc01195284f43912890fc",
+            "version": "6.12.0-135.el10",
+            "sha256": "5a75e7fd8fc9c5eb8c98c4403b173716d8e7c551c30d8b02a4ae0b9b3f2f6c56",
         },
-        "gcc-toolset-14-binutils": {
-            "version": "2.41-5.el9",
-            "sha256": "cb555545d16fff3fbb1ac78aec3d81aca8b84b8b063abcd387ed31754bb45521",
+        "glibc": {
+            "version": "2.39-65.el10",
+            "sha256": "72b4fed5b009f3afff32005c6720f334fad8e068225832ddeba15c9c2ea78034",
         },
+        "libgcc": {
+            "version": "14.3.1-2.1.el10",
+            "sha256": "9ba86ec9a341cb262d094c06f0759a2aae1e34c00e8d3a5c0821d40afe3bf598",
+        },
+        "libmpc": {
+            "version": "1.3.1-7.el10",
+            "sha256": "bb46a7465559a26c085bf1c02f0764332430a6c1b8fb3f08c8cee184e3d1f02a",
+        },
+        "gmp": {
+            "version": "6.2.1-12.el10",
+            "sha256": "9bbe58df2a29320daf9b4c36305fcc7f781ab0bdd486736c6d8c685838141a41",
+        },
+        "mpfr": {
+            "version": "4.2.1-5.el10",
+            "sha256": "30067f4b30700a4dbe21ee5ce458f3a6ab41b7a419b8be572e21967316877b10",
+        },
+
     },
 }
 
@@ -96,54 +149,7 @@ def _centos_gcc_toolchain_impl(repository_ctx):
     base_url_template = "https://autosd.sig.centos.org/AutoSD-{release}/nightly/repos/AutoSD/compose/AutoSD/{arch}/os/Packages/{pkg_name}-{version}.{arch}.rpm"
     download_and_extract_packages(repository_ctx, packages, base_url_template, _CENTOS_RELEASE, rpm_arch, "CentOS {}".format(_CENTOS_RELEASE))
 
-    # Create symbolic links from standard paths to gcc-toolset-14 paths
-    # This allows the standard toolchain logic to work without modification
-    gcc_toolset_root = "opt/rh/gcc-toolset-14/root"
-
-    # Create directories and copy essential gcc-toolset-14 components to standard locations
-    repository_ctx.execute(["mkdir", "-p", "usr/bin", "usr/lib", "usr/libexec", "usr/include"])
-
-    # Copy GCC internal components (needed for compilation headers like stddef.h)
-    repository_ctx.execute([
-        "cp", "-r",
-        "{}/usr/lib/gcc".format(gcc_toolset_root),
-        "usr/lib/gcc"
-    ])
-    repository_ctx.execute([
-        "cp", "-r",
-        "{}/usr/libexec/gcc".format(gcc_toolset_root),
-        "usr/libexec/gcc"
-    ])
-
-    # Copy gcc-toolset-14 headers to standard location
-    repository_ctx.execute([
-        "bash", "-c",
-        "if [ -d {}/usr/include ]; then cp -r {}/usr/include/* usr/include/ 2>/dev/null || true; fi".format(gcc_toolset_root, gcc_toolset_root)
-    ])
-
-    # Copy C++ headers from gcc-toolset-14 location to standard location
-    repository_ctx.execute([
-        "bash", "-c",
-        "if [ -d {}/usr/include/c++ ]; then mkdir -p usr/include/c++ && cp -r {}/usr/include/c++/* usr/include/c++/ 2>/dev/null || true; fi".format(gcc_toolset_root, gcc_toolset_root)
-    ])
-
-    # Create wrapper scripts for gcc-toolset-14 tools to handle library dependencies
-    tools = ["gcc", "g++", "cpp", "ar", "ld", "ld.bfd", "objcopy", "strip", "objdump", "as"]
-
-    for tool in tools:
-        # Create a wrapper script that sets LD_LIBRARY_PATH
-        wrapper_content = "#!/bin/bash\n"
-        wrapper_content += "# Wrapper for {} to ensure libraries are found\n".format(tool)
-        wrapper_content += "# Get the directory of this script\n"
-        wrapper_content += "SCRIPT_DIR=\"$(dirname \"$(readlink -f \"$0\")\")\"\n"
-        wrapper_content += "REPO_ROOT=\"$(dirname \"$(dirname \"$SCRIPT_DIR\")\")\"  # Go up from usr/bin to repo root\n"
-        wrapper_content += "TOOLSET_ROOT=\"$REPO_ROOT/{}\"\n".format(gcc_toolset_root)
-        wrapper_content += "export LD_LIBRARY_PATH=\"$TOOLSET_ROOT/usr/lib64:$TOOLSET_ROOT/usr/lib:$LD_LIBRARY_PATH\"\n"
-        wrapper_content += "exec \"$TOOLSET_ROOT/usr/bin/{}\" \"$@\"\n".format(tool)
-
-        repository_ctx.file("usr/bin/{}".format(tool), wrapper_content, executable=True)
-
-    # Use shared GCC version detection (now that gcc is available at usr/bin/gcc)
+    # Use shared GCC version detection
     gcc_version, gcc_major = detect_gcc_version(repository_ctx)
 
     # Use flags passed from the extension (or defaults if none provided)
@@ -172,6 +178,7 @@ def _centos_gcc_toolchain_impl(repository_ctx):
             "{C_FLAGS}": c_flags_str,
             "{CXX_FLAGS}": cxx_flags_str,
             "{LINK_FLAGS}": link_flags_str,
+            "{GLIBC_CONSTRAINT}": "glibc_2_39_plus",
         },
     )
 
@@ -180,7 +187,7 @@ def _centos_gcc_toolchain_impl(repository_ctx):
         "cc_toolchain_config.bzl",
         Label("@multi_gcc_toolchain//common:cc_toolchain_config.bzl.template"),
         substitutions = {
-            "{REPO_NAME}": "multi_gcc_toolchain++centos_gcc_extension+centos_gcc_repo",
+            "{REPO_NAME}": repository_ctx.name,
             "{DISTRO_NAME}": "centos",
         },
     )
