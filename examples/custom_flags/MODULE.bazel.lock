@@ -136,6 +136,48 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
+    "@@multi_gcc_toolchain+//centos_gcc:extensions.bzl%centos_gcc_extension": {
+      "general": {
+        "bzlTransitiveDigest": "Makwv4rtv9+wfazBe3nCribZduwxikUmNA/ocsk9POs=",
+        "usagesDigest": "QMrGflxHSZG4XTXTdepa4F+C4hLXO/JbuuayTHwZL2g=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "centos_gcc_repo": {
+            "repoRuleId": "@@multi_gcc_toolchain+//centos_gcc:extensions.bzl%centos_gcc_toolchain",
+            "attributes": {
+              "c_flags": [
+                "-O3",
+                "-DNDEBUG",
+                "-march=native",
+                "-DCUSTOM_DEFINE=1"
+              ],
+              "cxx_flags": [
+                "-O3",
+                "-DNDEBUG",
+                "-march=native",
+                "-std=c++17",
+                "-DCUSTOM_DEFINE=1"
+              ],
+              "link_flags": [
+                "-flto",
+                "-s"
+              ]
+            }
+          },
+          "centos_gcc_repo_1": {
+            "repoRuleId": "@@multi_gcc_toolchain+//centos_gcc:extensions.bzl%centos_gcc_toolchain",
+            "attributes": {
+              "c_flags": [],
+              "cxx_flags": [],
+              "link_flags": []
+            }
+          }
+        },
+        "recordedRepoMappingEntries": []
+      }
+    },
     "@@multi_gcc_toolchain+//fedora_gcc:extensions.bzl%fedora_gcc_extension": {
       "general": {
         "bzlTransitiveDigest": "Jcsbay/zeOf7fPu0bDtLpxlCak+ah7avzzh485nhGLA=",

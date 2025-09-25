@@ -14,11 +14,16 @@ filegroup(
         "usr/bin/gcc",
         "usr/bin/g++",
         "usr/bin/cpp",
+        "usr/bin/as",
     ] + glob([
         "usr/lib/gcc/**/*",
-        "usr/libexec/gcc/**/*",
+        "usr/libexec/**/*",
         "usr/include/**/*",
-    ]),
+        "usr/lib64/**/*.so*",
+        "usr/lib/**/*.so*",
+        "lib64/**/*",
+        "lib/**/*",
+    ], allow_empty = True),
 )
 
 filegroup(
@@ -33,7 +38,9 @@ filegroup(
         "usr/lib64/**/*.a",
         "usr/lib/**/*.so*",
         "usr/lib/**/*.a",
-    ]),
+        "lib64/**/*",
+        "lib/**/*",
+    ], allow_empty = True),
 )
 
 filegroup(
@@ -62,11 +69,11 @@ cc_toolchain_config(
     gcc_version = "{GCC_VERSION}",
     target_arch = "{TARGET_ARCH}",
     include_dirs = [
-        "usr/lib/gcc/{TARGET_ARCH}-redhat-linux/{GCC_MAJOR}/include",
-        "usr/include",
-        "usr/include/c++/{GCC_MAJOR}",
-        "usr/include/c++/{GCC_MAJOR}/{TARGET_ARCH}-redhat-linux",
-        "usr/include/c++/{GCC_MAJOR}/backward",
+        "/usr/lib/gcc/{TARGET_ARCH}-redhat-linux/{GCC_MAJOR}/include",
+        "/usr/include",
+        "/usr/include/c++/{GCC_MAJOR}",
+        "/usr/include/c++/{GCC_MAJOR}/{TARGET_ARCH}-redhat-linux",
+        "/usr/include/c++/{GCC_MAJOR}/backward",
     ],
     c_flags = [{C_FLAGS}],
     cxx_flags = [{CXX_FLAGS}],
@@ -97,6 +104,7 @@ toolchain(
     target_compatible_with = [
         "@platforms//os:linux",
         "@platforms//cpu:{BAZEL_CPU}",
+        "@multi_gcc_toolchain//constraints:{GLIBC_CONSTRAINT}",
     ],
     toolchain = ":gcc_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",

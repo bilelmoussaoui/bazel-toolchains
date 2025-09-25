@@ -1,0 +1,58 @@
+# Glibc version constraints for toolchain selection
+
+package(default_visibility = ["//visibility:public"])
+
+# Define the glibc version dimension
+constraint_setting(
+    name = "glibc_version",
+)
+
+# Glibc 2.39+ constraint for AutoSD 10/CentOS compatibility
+constraint_value(
+    name = "glibc_2_39_plus",
+    constraint_setting = ":glibc_version",
+)
+
+# Glibc 2.41+ constraint for Fedora 42 compatibility
+constraint_value(
+    name = "glibc_2_41_plus",
+    constraint_setting = ":glibc_version",
+)
+
+# Platform definition for AutoSD 10/CentOS requiring glibc 2.39+
+platform(
+    name = "autosd10_x86_64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+        ":glibc_2_39_plus",
+    ],
+)
+
+platform(
+    name = "autosd10_aarch64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:aarch64",
+        ":glibc_2_39_plus",
+    ],
+)
+
+# Platform definition for Fedora 42 requiring glibc 2.41+
+platform(
+    name = "fedora42_x86_64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+        ":glibc_2_41_plus",
+    ],
+)
+
+platform(
+    name = "fedora42_aarch64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:aarch64",
+        ":glibc_2_41_plus",
+    ],
+)

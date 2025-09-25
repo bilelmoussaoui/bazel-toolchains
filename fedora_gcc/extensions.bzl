@@ -53,6 +53,31 @@ _PACKAGES_BY_ARCH = {
             "sha256": "253b4aa5bd18ca9798b9c631941d1a6478c22d2f91163a1a1fe740f280a3a0aa",
             "subpath": "k"
         },
+        "glibc": {
+            "version": "2.41-1.fc42",
+            "sha256": "6584cd3ac8fcffe7783c8f53bc4cb2907ab3c2ace3a34d14fe93e90d75509f50",
+            "subpath": "g"
+        },
+        "libgcc": {
+            "version": "15.0.1-0.11.fc42",
+            "sha256": "d122eac0f888d3aaf35ffc214e00e522b8c8264f4d9024f24be1365ba8dd903f",
+            "subpath": "l"
+        },
+        "libmpc": {
+            "version": "1.3.1-7.fc42",
+            "sha256": "13f4ae2bebbbe144714f4dc74bcd01dde9e667bff8cd133915f2170a04ad553d",
+            "subpath": "l"
+        },
+        "gmp": {
+            "version": "6.3.0-4.fc42",
+            "sha256": "1193ba8d39771dc2ff3798c14515ffb9952c0007b529374b24caa8c22aed4493",
+            "subpath": "g"
+        },
+        "mpfr": {
+            "version": "4.2.2-1.fc42",
+            "sha256": "d0559913dac8fe29ef627859c15e609de6de1122984b3f901400fc77ef7acd4e",
+            "subpath": "m"
+        },
     },
     "aarch64": {
         "gcc": {
@@ -94,6 +119,31 @@ _PACKAGES_BY_ARCH = {
             "version": "6.14.0-63.fc42",
             "sha256": "d4b2bf8420ae9606c7df17dc39a524dc0fd67c5a016549fc57c791073093e0ac",
             "subpath": "k"
+        },
+        "glibc": {
+            "version": "2.41-1.fc42",
+            "sha256": "66bf46511f945ef210cf8d364170f9c64f9b2788db76aedaf9094dd97edffdfc",
+            "subpath": "g"
+        },
+        "libgcc": {
+            "version": "15.0.1-0.11.fc42",
+            "sha256": "8260a420b69d22b039449d33bd63aeb498574a94b885b4e69556985df64adb11",
+            "subpath": "l"
+        },
+        "libmpc": {
+            "version": "1.3.1-7.fc42",
+            "sha256": "51940f125f3dca505051490141a645112d7bb72abe17681f173f3edcebb71886",
+            "subpath": "l"
+        },
+        "gmp": {
+            "version": "6.3.0-4.fc42",
+            "sha256": "ba667916b37c33c1cfd7ade6e63a7fcce04ef1da4e7387180b5397f1be10b230",
+            "subpath": "g"
+        },
+        "mpfr": {
+            "version": "4.2.2-1.fc42",
+            "sha256": "e5277bf2d5e9324fdb9844581b4869d120d0046507340b434e381fe868ee50c1",
+            "subpath": "m"
         },
     },
 }
@@ -151,6 +201,7 @@ def _fedora_gcc_toolchain_impl(repository_ctx):
             "{C_FLAGS}": c_flags_str,
             "{CXX_FLAGS}": cxx_flags_str,
             "{LINK_FLAGS}": link_flags_str,
+            "{GLIBC_CONSTRAINT}": "glibc_2_41_plus",
         },
     )
 
@@ -159,7 +210,7 @@ def _fedora_gcc_toolchain_impl(repository_ctx):
         "cc_toolchain_config.bzl",
         Label("@multi_gcc_toolchain//common:cc_toolchain_config.bzl.template"),
         substitutions = {
-            "{REPO_NAME}": "multi_gcc_toolchain++fedora_gcc_extension+fedora_gcc_repo",
+            "{REPO_NAME}": repository_ctx.name,
             "{DISTRO_NAME}": "fedora",
         },
     )

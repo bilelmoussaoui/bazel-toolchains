@@ -165,11 +165,11 @@ def main():
     if len(sys.argv) != 4:
         print("Usage: python3 update_packages.py <distro> <release> <arch>")
         print("  distro: Distribution name (fedora or centos)")
-        print("  release: Distribution version (e.g., 42 for Fedora, 9 for CentOS)")
+        print("  release: Distribution version (e.g., 42 for Fedora, 10 for CentOS)")
         print("  arch: Target architecture (x86_64 or aarch64)")
         print("Examples:")
         print("  python3 update_packages.py fedora 42 x86_64")
-        print("  python3 update_packages.py centos 9 x86_64")
+        print("  python3 update_packages.py centos 10 x86_64")
         sys.exit(1)
 
     distro = sys.argv[1].lower()
@@ -202,20 +202,13 @@ def main():
         'glibc-devel',
         'libstdc++-devel',
         'libstdc++',
-        'kernel-headers'
+        'kernel-headers',
+        'glibc',
+        'libgcc',
+        'libmpc',
+        'gmp',
+        'mpfr',
     ]
-
-    if distro == 'centos':
-        # Use gcc-toolset-14 packages for CentOS for modern toolchain
-        package_names = [
-            'gcc-toolset-14-gcc',
-            'gcc-toolset-14-gcc-c++',
-            'glibc-devel',
-            'glibc-headers',  # Essential: contains basic C headers like stdio.h
-            'gcc-toolset-14-libstdc++-devel',
-            'kernel-headers',
-            'gcc-toolset-14-binutils'
-        ]
 
     packages_info = {}
 
