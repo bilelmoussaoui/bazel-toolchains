@@ -45,17 +45,11 @@ def _host_gcc_toolchain_impl(repository_ctx):
     # Detect system include directories
     system_includes = _detect_host_includes(repository_ctx)
 
-    # Define host-specific compiler flags
+    # Use flags passed from the extension (or defaults if none provided)
     host_flags = {
-        "c_flags": [
-            # Host system may have its own preferred flags
-        ],
-        "cxx_flags": [
-            # Host system may have its own preferred flags
-        ],
-        "link_flags": [
-            # Host system may have its own preferred flags
-        ]
+        "c_flags": getattr(repository_ctx.attr, "c_flags", []),
+        "cxx_flags": getattr(repository_ctx.attr, "cxx_flags", []),
+        "link_flags": getattr(repository_ctx.attr, "link_flags", []),
     }
 
     # Use BUILD template instead of generating dynamically
@@ -93,14 +87,66 @@ def _host_gcc_toolchain_impl(repository_ctx):
 # Define the repository rule
 host_gcc_toolchain = repository_rule(
     implementation = _host_gcc_toolchain_impl,
+    attrs = {
+        "c_flags": attr.string_list(
+            doc = "C compiler flags for the toolchain",
+            default = [],  # Host toolchain has minimal defaults
+        ),
+        "cxx_flags": attr.string_list(
+            doc = "C++ compiler flags for the toolchain",
+            default = [],  # Host toolchain has minimal defaults
+        ),
+        "link_flags": attr.string_list(
+            doc = "Linker flags for the toolchain",
+            default = [],  # Host toolchain has minimal defaults
+        ),
+    },
     doc = "Repository rule for host GCC toolchain",
 )
 
 def _host_gcc_extension_impl(module_ctx):
     """Extension implementation for host GCC toolchain"""
-    host_gcc_toolchain(name = "host_gcc_repo")
+    # Create a separate toolchain for each module
+    for i, mod in enumerate(module_ctx.modules):
+        # Generate unique name for each module's toolchain
+        toolchain_name = "host_gcc_repo" if i == 0 else "host_gcc_repo_{}".format(i)
+
+        # Merge flags from all configure tags within this module
+        c_flags = []
+        cxx_flags = []
+        link_flags = []
+
+        for config_tag in mod.tags.configure:
+            c_flags.extend(config_tag.c_flags)
+            cxx_flags.extend(config_tag.cxx_flags)
+            link_flags.extend(config_tag.link_flags)
+
+        host_gcc_toolchain(
+            name = toolchain_name,
+            c_flags = c_flags,
+            cxx_flags = cxx_flags,
+            link_flags = link_flags,
+        )
+
+_configure_tag = tag_class(
+    attrs = {
+        "c_flags": attr.string_list(
+            doc = "C compiler flags for the host GCC toolchain",
+        ),
+        "cxx_flags": attr.string_list(
+            doc = "C++ compiler flags for the host GCC toolchain",
+        ),
+        "link_flags": attr.string_list(
+            doc = "Linker flags for the host GCC toolchain",
+        ),
+    },
+    doc = "Configure compiler and linker flags for the host GCC toolchain",
+)
 
 host_gcc_extension = module_extension(
     implementation = _host_gcc_extension_impl,
+    tag_classes = {
+        "configure": _configure_tag,
+    },
     doc = "Extension for host GCC toolchain",
 )

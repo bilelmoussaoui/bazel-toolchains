@@ -125,25 +125,11 @@ def _fedora_gcc_toolchain_impl(repository_ctx):
     # Use shared GCC version detection
     gcc_version, gcc_major = detect_gcc_version(repository_ctx)
 
-    # Define Fedora-specific compiler flags
+    # Use flags passed from the extension (or defaults if none provided)
     fedora_flags = {
-        "c_flags": [
-            "-O2",
-            "-g",
-            "-pipe",
-            "-fstack-protector-strong",
-            "-Wpedantic",
-        ],
-        "cxx_flags": [
-            "-O2",
-            "-g",
-            "-pipe",
-            "-fstack-protector-strong",
-        ],
-        "link_flags": [
-            "-Wl,-z,relro",
-            "-Wl,-z,now",
-        ]
+        "c_flags": getattr(repository_ctx.attr, "c_flags", []),
+        "cxx_flags": getattr(repository_ctx.attr, "cxx_flags", []),
+        "link_flags": getattr(repository_ctx.attr, "link_flags", []),
     }
 
     # Use BUILD template instead of generating dynamically
@@ -181,14 +167,66 @@ def _fedora_gcc_toolchain_impl(repository_ctx):
 # Define the repository rule
 fedora_gcc_toolchain = repository_rule(
     implementation = _fedora_gcc_toolchain_impl,
+    attrs = {
+        "c_flags": attr.string_list(
+            doc = "C compiler flags for the toolchain",
+            default = ["-O2", "-g", "-pipe", "-fstack-protector-strong", "-Wpedantic"],
+        ),
+        "cxx_flags": attr.string_list(
+            doc = "C++ compiler flags for the toolchain",
+            default = ["-O2", "-g", "-pipe", "-fstack-protector-strong"],
+        ),
+        "link_flags": attr.string_list(
+            doc = "Linker flags for the toolchain",
+            default = ["-Wl,-z,relro", "-Wl,-z,now"],
+        ),
+    },
     doc = "Repository rule for Fedora GCC toolchain",
 )
 
 def _fedora_gcc_extension_impl(module_ctx):
     """Extension implementation for Fedora GCC toolchain"""
-    fedora_gcc_toolchain(name = "fedora_gcc_repo")
+    # Create a separate toolchain for each module
+    for i, mod in enumerate(module_ctx.modules):
+        # Generate unique name for each module's toolchain
+        toolchain_name = "fedora_gcc_repo" if i == 0 else "fedora_gcc_repo_{}".format(i)
+
+        # Merge flags from all configure tags within this module
+        c_flags = []
+        cxx_flags = []
+        link_flags = []
+
+        for config_tag in mod.tags.configure:
+            c_flags.extend(config_tag.c_flags)
+            cxx_flags.extend(config_tag.cxx_flags)
+            link_flags.extend(config_tag.link_flags)
+
+        fedora_gcc_toolchain(
+            name = toolchain_name,
+            c_flags = c_flags,
+            cxx_flags = cxx_flags,
+            link_flags = link_flags,
+        )
+
+_configure_tag = tag_class(
+    attrs = {
+        "c_flags": attr.string_list(
+            doc = "C compiler flags for the Fedora GCC toolchain",
+        ),
+        "cxx_flags": attr.string_list(
+            doc = "C++ compiler flags for the Fedora GCC toolchain",
+        ),
+        "link_flags": attr.string_list(
+            doc = "Linker flags for the Fedora GCC toolchain",
+        ),
+    },
+    doc = "Configure compiler and linker flags for the Fedora GCC toolchain",
+)
 
 fedora_gcc_extension = module_extension(
     implementation = _fedora_gcc_extension_impl,
+    tag_classes = {
+        "configure": _configure_tag,
+    },
     doc = "Extension for Fedora GCC toolchain",
 )
