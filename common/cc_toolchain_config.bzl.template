@@ -8,86 +8,86 @@ def _impl(ctx):
         tool_path(name = "g++", path = "usr/bin/g++"),
         tool_path(name = "ld", path = "usr/bin/ld"),
         tool_path(name = "ar", path = "usr/bin/ar"),
+        tool_path(name = "as", path = "usr/bin/as"),
         tool_path(name = "cpp", path = "usr/bin/cpp"),
         tool_path(name = "gcov", path = "usr/bin/gcov"),
         tool_path(name = "nm", path = "usr/bin/nm"),
         tool_path(name = "objdump", path = "usr/bin/objdump"),
         tool_path(name = "strip", path = "usr/bin/strip"),
     ]
+    sysroot = "external/{REPO_NAME}"
 
-    # Compiler flags
+    # Basic compiler flags with sysroot
+    c_flag_sets = [
+        flag_set(
+            actions = [ACTION_NAMES.c_compile],
+            flag_groups = [
+                flag_group(flags = [
+                    "--sysroot=" + sysroot,
+                    "-B" + sysroot + "/usr/bin",
+                    "-nostdinc",
+                    "-isystem", sysroot + "/usr/lib/gcc/" + ctx.attr.target_arch + "-redhat-linux/" + ctx.attr.gcc_version.split('.')[0] + "/include",
+                    "-isystem", sysroot + "/usr/include",
+                    "-L" + sysroot + "/usr/lib64",
+                    "-L" + sysroot + "/usr/lib",
+                ] + (ctx.attr.c_flags if ctx.attr.c_flags else [])),
+            ],
+        ),
+        flag_set(
+            actions = [ACTION_NAMES.cpp_compile],
+            flag_groups = [
+                flag_group(flags = [
+                    "--sysroot=" + sysroot,
+                    "-B" + sysroot + "/usr/bin",
+                    "-nostdinc++",
+                    "-nostdinc",
+                    "-isystem", sysroot + "/usr/include/c++/" + ctx.attr.gcc_version.split('.')[0],
+                    "-isystem", sysroot + "/usr/include/c++/" + ctx.attr.gcc_version.split('.')[0] + "/" + ctx.attr.target_arch + "-redhat-linux",
+                    "-isystem", sysroot + "/usr/include/c++/" + ctx.attr.gcc_version.split('.')[0] + "/backward",
+                    "-isystem", sysroot + "/usr/lib/gcc/" + ctx.attr.target_arch + "-redhat-linux/" + ctx.attr.gcc_version.split('.')[0] + "/include",
+                    "-isystem", sysroot + "/usr/include",
+                    "-L" + sysroot + "/usr/lib64",
+                    "-L" + sysroot + "/usr/lib",
+                ] + (ctx.attr.cxx_flags if ctx.attr.cxx_flags else [])),
+            ],
+        ),
+    ]
+
     default_compile_flags = feature(
         name = "default_compile_flags",
         enabled = True,
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.c_compile],
-                flag_groups = [
-                    flag_group(
-                        flags = [
-                            "-B" + "external/{REPO_NAME}/usr/bin",
-                            "-nostdinc",
-                            "-isystem", "external/{REPO_NAME}/usr/lib/gcc/" + ctx.attr.target_arch + "-redhat-linux/" + ctx.attr.gcc_version.split('.')[0] + "/include",
-                            "-isystem", "external/{REPO_NAME}/usr/include",
-                            "-Wall",
-                            "-Wextra",
-                            "-Wno-builtin-macro-redefined",
-                            "-D__DATE__=redacted",
-                            "-D__TIMESTAMP__=redacted",
-                            "-D__TIME__=redacted",
-                        ] + ctx.attr.c_flags,
-                    ),
-                ],
-            ),
-            flag_set(
-                actions = [ACTION_NAMES.cpp_compile],
-                flag_groups = [
-                    flag_group(
-                        flags = [
-                            "-B" + "external/{REPO_NAME}/usr/bin",
-                            "-nostdinc++",
-                            "-isystem", "external/{REPO_NAME}/usr/include/c++/" + ctx.attr.gcc_version.split('.')[0],
-                            "-isystem", "external/{REPO_NAME}/usr/include/c++/" + ctx.attr.gcc_version.split('.')[0] + "/" + ctx.attr.target_arch + "-redhat-linux",
-                            "-isystem", "external/{REPO_NAME}/usr/include/c++/" + ctx.attr.gcc_version.split('.')[0] + "/backward",
-                            "-nostdinc",
-                            "-isystem", "external/{REPO_NAME}/usr/lib/gcc/" + ctx.attr.target_arch + "-redhat-linux/" + ctx.attr.gcc_version.split('.')[0] + "/include",
-                            "-isystem", "external/{REPO_NAME}/usr/include",
-                            "-Wall",
-                            "-Wextra",
-                            "-Wno-builtin-macro-redefined",
-                            "-D__DATE__=redacted",
-                            "-D__TIMESTAMP__=redacted",
-                            "-D__TIME__=redacted",
-                        ] + ctx.attr.cxx_flags,
-                    ),
-                ],
-            ),
-        ],
+        flag_sets = c_flag_sets,
     )
+
+    # Basic linker flags for C and C++
+    link_flag_sets = [
+        flag_set(
+            actions = [
+                ACTION_NAMES.cpp_link_executable,
+                ACTION_NAMES.cpp_link_dynamic_library,
+            ],
+            flag_groups = [
+                flag_group(flags = [
+                    "--sysroot=" + sysroot,
+                    "-B" + sysroot + "/usr/bin",
+                    "-L" + sysroot + "/usr/lib64",
+                    "-L" + sysroot + "/usr/lib",
+                    "-Wl,-rpath-link," + sysroot + "/usr/lib64",
+                    "-Wl,-rpath-link," + sysroot + "/usr/lib",
+                    "-lstdc++",
+                    "-lm",
+                    "-lgcc_s",
+                    "-lgcc",
+                    "-lc",
+                ] + (ctx.attr.link_flags if ctx.attr.link_flags else [])),
+            ],
+        ),
+    ]
 
     default_link_flags = feature(
         name = "default_link_flags",
         enabled = True,
-        flag_sets = [
-            flag_set(
-                actions = [
-                    ACTION_NAMES.cpp_link_executable,
-                    ACTION_NAMES.cpp_link_dynamic_library,
-                ],
-                flag_groups = [
-                    flag_group(
-                        flags = [
-                            "-B" + "external/{REPO_NAME}/usr/bin",
-                            "-L" + "external/{REPO_NAME}/usr/lib/gcc/" + ctx.attr.target_arch + "-redhat-linux/" + ctx.attr.gcc_version.split('.')[0],
-                            "-L" + "external/{REPO_NAME}/usr/lib64",
-                            "-L" + "external/{REPO_NAME}/usr/lib",
-                            "-lstdc++",
-                            "-lm",
-                        ] + ctx.attr.link_flags,
-                    ),
-                ],
-            ),
-        ],
+        flag_sets = link_flag_sets,
     )
 
     # Feature to disable absolute path warnings for system headers

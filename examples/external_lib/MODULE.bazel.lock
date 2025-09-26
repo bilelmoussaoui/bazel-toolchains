@@ -140,7 +140,7 @@
   "moduleExtensions": {
     "@@multi_gcc_toolchain+//centos_gcc:extensions.bzl%centos_gcc_extension": {
       "general": {
-        "bzlTransitiveDigest": "6fUeozhKjITjKdpQ5s8OCg7/d7DZ/u3K27uKvYtI0/w=",
+        "bzlTransitiveDigest": "wcAVpH1Ax7CtDffyrL2xAdm8p4wk52wFtBD3rR/8OUs=",
         "usagesDigest": "wzFlR4oSs02Z/q66YUA3e/kxVD1uYCu7gUKfK3AyOXM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -148,7 +148,19 @@
         "generatedRepoSpecs": {
           "centos_gcc_repo": {
             "repoRuleId": "@@multi_gcc_toolchain+//centos_gcc:extensions.bzl%centos_gcc_toolchain",
-            "attributes": {}
+            "attributes": {
+              "c_flags": [],
+              "cxx_flags": [],
+              "link_flags": []
+            }
+          },
+          "centos_gcc_repo_1": {
+            "repoRuleId": "@@multi_gcc_toolchain+//centos_gcc:extensions.bzl%centos_gcc_toolchain",
+            "attributes": {
+              "c_flags": [],
+              "cxx_flags": [],
+              "link_flags": []
+            }
           }
         },
         "recordedRepoMappingEntries": []
@@ -156,7 +168,7 @@
     },
     "@@multi_gcc_toolchain+//fedora_gcc:extensions.bzl%fedora_gcc_extension": {
       "general": {
-        "bzlTransitiveDigest": "yH8XYjaQQJhhBluvFzb1/jIZpl2Ig58kfwsc1/90qD4=",
+        "bzlTransitiveDigest": "nNugDo7m0QdeUrTZaF+Sdw0lRb9KaT9ef3DIBC6oZls=",
         "usagesDigest": "EDNRt2rknkkQj5z6AwrytSeBOp7WqgwetZ+LhMvhAx0=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -164,7 +176,19 @@
         "generatedRepoSpecs": {
           "fedora_gcc_repo": {
             "repoRuleId": "@@multi_gcc_toolchain+//fedora_gcc:extensions.bzl%fedora_gcc_toolchain",
-            "attributes": {}
+            "attributes": {
+              "c_flags": [],
+              "cxx_flags": [],
+              "link_flags": []
+            }
+          },
+          "fedora_gcc_repo_1": {
+            "repoRuleId": "@@multi_gcc_toolchain+//fedora_gcc:extensions.bzl%fedora_gcc_toolchain",
+            "attributes": {
+              "c_flags": [],
+              "cxx_flags": [],
+              "link_flags": []
+            }
           }
         },
         "recordedRepoMappingEntries": []
