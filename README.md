@@ -4,10 +4,11 @@ This repository provides isolated GCC toolchains built from Linux distribution R
 
 ## 🎯 Features
 
-- **Multiple Toolchains**: Support for Fedora, CentOS, and Host system GCC
+- **Multiple Toolchains**: Support for Fedora 42, AutoSD 10, AutoSD 9, and Host system GCC
 - **Isolated Builds**: RPM-based toolchains with no host system dependencies
 - **Host Integration**: Fast host toolchain using system GCC installation
 - **Architecture Support**: x86_64 and aarch64
+- **Multiple GCC Versions**: GCC 15 (Fedora 42), GCC 14 (AutoSD 10), GCC 11 (AutoSD 9)
 
 ## 🏗️ Repository Structure
 
@@ -19,11 +20,14 @@ This repository provides isolated GCC toolchains built from Linux distribution R
 │   ├── BUILD.bazel          # Common utilities build file
 │   └── toolchain_utils.bzl  # Shared utilities for all toolchains
 ├── fedora_gcc/
-│   ├── BUILD.bazel          # Fedora-specific build file
+│   ├── BUILD.bazel          # Fedora 42 GCC 15 build file
 │   └── extensions.bzl       # Fedora GCC toolchain extension
-├── centos_gcc/
-│   ├── BUILD.bazel          # CentOS-specific build file
-│   └── extensions.bzl       # CentOS GCC toolchain extension
+├── autosd_10_gcc/
+│   ├── BUILD.bazel          # AutoSD 10 GCC 14 build file
+│   └── extensions.bzl       # AutoSD 10 GCC toolchain extension
+├── autosd_9_gcc/
+│   ├── BUILD.bazel          # AutoSD 9 GCC 11 build file
+│   └── extensions.bzl       # AutoSD 9 GCC toolchain extension
 ├── host_gcc/
 │   ├── BUILD.bazel          # Host system build file
 │   └── extensions.bzl       # Host GCC toolchain extension
@@ -74,17 +78,30 @@ use_repo(fedora_gcc, "fedora_gcc_repo")
 register_toolchains("@fedora_gcc_repo//:gcc_toolchain_linux_x86_64")
 ```
 
-### Using CentOS GCC Toolchain
+### Using AutoSD 10 GCC Toolchain (GCC 14)
 
 ```python
 bazel_dep(name = "multi_gcc_toolchain", version = "1.0.0")
 
-# Use the CentOS extension
-centos_gcc = use_extension("@multi_gcc_toolchain//centos_gcc:extensions.bzl", "centos_gcc_extension")
-use_repo(centos_gcc, "centos_gcc_repo")
+# Use the AutoSD 10 extension
+autosd_10_gcc = use_extension("@multi_gcc_toolchain//autosd_10_gcc:extensions.bzl", "autosd_10_gcc_extension")
+use_repo(autosd_10_gcc, "autosd_10_gcc_repo")
 
 # Register the toolchain
-register_toolchains("@centos_gcc_repo//:gcc_toolchain_linux_x86_64")
+register_toolchains("@autosd_10_gcc_repo//:gcc_toolchain_linux_x86_64")
+```
+
+### Using AutoSD 9 GCC Toolchain (GCC 11)
+
+```python
+bazel_dep(name = "multi_gcc_toolchain", version = "1.0.0")
+
+# Use the AutoSD 9 extension
+autosd_9_gcc = use_extension("@multi_gcc_toolchain//autosd_9_gcc:extensions.bzl", "autosd_9_gcc_extension")
+use_repo(autosd_9_gcc, "autosd_9_gcc_repo")
+
+# Register the toolchain
+register_toolchains("@autosd_9_gcc_repo//:gcc_toolchain_linux_x86_64")
 ```
 
 ### Using Host GCC Toolchain
@@ -105,10 +122,13 @@ register_toolchains("@host_gcc_repo//:gcc_toolchain_linux_x86_64")
 Use the unified update script to fetch the latest package versions and SHA256 hashes:
 
 ```bash
-# For Fedora
+# For Fedora 42
 python3 update_packages.py fedora 42 x86_64
 
-# For CentOS
+# For AutoSD 10 (CentOS Stream 10)
+python3 update_packages.py centos 10 x86_64
+
+# For AutoSD 9 (CentOS Stream 9)
 python3 update_packages.py centos 9 x86_64
 ```
 
@@ -116,8 +136,9 @@ Copy the output into the respective `extensions.bzl` file.
 
 ## ✅ Status
 
-- **Fedora GCC Toolchain**: ✅ Fully functional and tested
-- **CentOS GCC Toolchain**: ✅ Fully functional and tested on x86_64
+- **Fedora 42 GCC Toolchain (GCC 15)**: ✅ Fully functional and tested
+- **AutoSD 10 GCC Toolchain (GCC 14)**: ✅ Fully functional and tested on x86_64
+- **AutoSD 9 GCC Toolchain (GCC 11)**: ✅ Fully functional and tested on x86_64
 - **Host GCC Toolchain**: ✅ Fully functional and tested
 
 ## 🎨 Features
@@ -129,14 +150,18 @@ Copy the output into the respective `extensions.bzl` file.
 
 ## 🔍 Architecture Details
 
-### RPM-Based Toolchains (Fedora/CentOS)
+### RPM-Based Toolchains (Fedora/AutoSD)
 
 - Isolated GCC compilation environment
 - No host system header/library dependencies
 - Proper header path isolation with `-nostdinc`/`-nostdinc++`
 - Library path isolation with `-B` and `-L` flags
+- Sysroot-based linking for static and dynamic library support
 - Download and extract RPM packages for complete self-contained environment
 - Distribution-specific compiler flags support
+- **Fedora 42**: GCC 15.0.1, glibc 2.41
+- **AutoSD 10**: GCC 14.3.1, glibc 2.39 (CentOS Stream 10)
+- **AutoSD 9**: GCC 11.5.0, glibc 2.34 (CentOS Stream 9)
 
 ### Host System Toolchain
 

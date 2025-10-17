@@ -1,17 +1,17 @@
 """
-CentOS GCC Toolchain for Bazel
+AutoSD 10 GCC Toolchain for Bazel
 
-This extension provides an isolated GCC toolchain built from CentOS RPM packages.
+This extension provides an isolated GCC toolchain built from AutoSD 10 (CentOS Stream 10) RPM packages.
 """
 
 load("//common:toolchain_utils.bzl", "validate_system_requirements", "get_target_architecture",
      "detect_gcc_version", "download_and_extract_packages")
 
 # Configuration
-_CENTOS_RELEASE = "10"
+_AUTOSD_RELEASE = "10"
 
 # Essential packages for a complete GCC toolchain - organized by architecture
-# Note: CentOS uses different package versions and repository structure
+# Note: AutoSD 10 uses CentOS Stream 10 package versions and repository structure
 _PACKAGES_BY_ARCH = {
     "x86_64": {
         "gcc": {
@@ -124,11 +124,11 @@ _PACKAGES_BY_ARCH = {
     },
 }
 
-def _centos_gcc_toolchain_impl(repository_ctx):
-    """Downloads CentOS RPM packages and creates an isolated GCC toolchain.
+def _autosd_10_gcc_toolchain_impl(repository_ctx):
+    """Downloads AutoSD 10 RPM packages and creates an isolated GCC toolchain.
 
     This function creates a complete, self-contained GCC toolchain by downloading
-    and extracting essential packages from CentOS repositories, then configuring
+    and extracting essential packages from AutoSD 10 repositories, then configuring
     them to work independently of the host system.
     """
     # Use shared validation
@@ -145,15 +145,15 @@ def _centos_gcc_toolchain_impl(repository_ctx):
         ))
 
     # Use shared download and extraction logic
-    # CentOS uses different URL structure than Fedora - no subpath needed
+    # AutoSD 10 uses CentOS Stream 10 URL structure - no subpath needed
     base_url_template = "https://autosd.sig.centos.org/AutoSD-{release}/nightly/repos/AutoSD/compose/AutoSD/{arch}/os/Packages/{pkg_name}-{version}.{arch}.rpm"
-    download_and_extract_packages(repository_ctx, packages, base_url_template, _CENTOS_RELEASE, rpm_arch, "CentOS {}".format(_CENTOS_RELEASE))
+    download_and_extract_packages(repository_ctx, packages, base_url_template, _AUTOSD_RELEASE, rpm_arch, "AutoSD {}".format(_AUTOSD_RELEASE))
 
     # Use shared GCC version detection
     gcc_version, gcc_major = detect_gcc_version(repository_ctx)
 
     # Use flags passed from the extension (or defaults if none provided)
-    centos_flags = {
+    autosd_flags = {
         "c_flags": getattr(repository_ctx.attr, "c_flags", []),
         "cxx_flags": getattr(repository_ctx.attr, "cxx_flags", []),
         "link_flags": getattr(repository_ctx.attr, "link_flags", []),
@@ -163,9 +163,9 @@ def _centos_gcc_toolchain_impl(repository_ctx):
     bazel_cpu = "x86_64" if rpm_arch == "x86_64" else "aarch64"
 
     # Format flag lists for template substitution
-    c_flags_str = ', '.join(['"{}"'.format(flag) for flag in centos_flags.get("c_flags", [])])
-    cxx_flags_str = ', '.join(['"{}"'.format(flag) for flag in centos_flags.get("cxx_flags", [])])
-    link_flags_str = ', '.join(['"{}"'.format(flag) for flag in centos_flags.get("link_flags", [])])
+    c_flags_str = ', '.join(['"{}"'.format(flag) for flag in autosd_flags.get("c_flags", [])])
+    cxx_flags_str = ', '.join(['"{}"'.format(flag) for flag in autosd_flags.get("cxx_flags", [])])
+    link_flags_str = ', '.join(['"{}"'.format(flag) for flag in autosd_flags.get("link_flags", [])])
 
     repository_ctx.template(
         "BUILD.bazel",
@@ -188,13 +188,13 @@ def _centos_gcc_toolchain_impl(repository_ctx):
         Label("@multi_gcc_toolchain//common:cc_toolchain_config.bzl.template"),
         substitutions = {
             "{REPO_NAME}": repository_ctx.name,
-            "{DISTRO_NAME}": "centos",
+            "{DISTRO_NAME}": "autosd_10",
         },
     )
 
 # Define the repository rule
-centos_gcc_toolchain = repository_rule(
-    implementation = _centos_gcc_toolchain_impl,
+autosd_10_gcc_toolchain = repository_rule(
+    implementation = _autosd_10_gcc_toolchain_impl,
     attrs = {
         "c_flags": attr.string_list(
             doc = "C compiler flags for the toolchain",
@@ -209,15 +209,15 @@ centos_gcc_toolchain = repository_rule(
             default = ["-Wl,-z,relro", "-Wl,-z,now"],
         ),
     },
-    doc = "Repository rule for CentOS GCC toolchain",
+    doc = "Repository rule for AutoSD 10 GCC toolchain",
 )
 
-def _centos_gcc_extension_impl(module_ctx):
-    """Extension implementation for CentOS GCC toolchain"""
+def _autosd_10_gcc_extension_impl(module_ctx):
+    """Extension implementation for AutoSD 10 GCC toolchain"""
     # Create a separate toolchain for each module
     for i, mod in enumerate(module_ctx.modules):
         # Generate unique name for each module's toolchain
-        toolchain_name = "centos_gcc_repo" if i == 0 else "centos_gcc_repo_{}".format(i)
+        toolchain_name = "autosd_10_gcc_repo" if i == 0 else "autosd_10_gcc_repo_{}".format(i)
 
         # Merge flags from all configure tags within this module
         c_flags = []
@@ -229,7 +229,7 @@ def _centos_gcc_extension_impl(module_ctx):
             cxx_flags.extend(config_tag.cxx_flags)
             link_flags.extend(config_tag.link_flags)
 
-        centos_gcc_toolchain(
+        autosd_10_gcc_toolchain(
             name = toolchain_name,
             c_flags = c_flags,
             cxx_flags = cxx_flags,
@@ -239,22 +239,22 @@ def _centos_gcc_extension_impl(module_ctx):
 _configure_tag = tag_class(
     attrs = {
         "c_flags": attr.string_list(
-            doc = "C compiler flags for the CentOS GCC toolchain",
+            doc = "C compiler flags for the AutoSD 10 GCC toolchain",
         ),
         "cxx_flags": attr.string_list(
-            doc = "C++ compiler flags for the CentOS GCC toolchain",
+            doc = "C++ compiler flags for the AutoSD 10 GCC toolchain",
         ),
         "link_flags": attr.string_list(
-            doc = "Linker flags for the CentOS GCC toolchain",
+            doc = "Linker flags for the AutoSD 10 GCC toolchain",
         ),
     },
-    doc = "Configure compiler and linker flags for the CentOS GCC toolchain",
+    doc = "Configure compiler and linker flags for the AutoSD 10 GCC toolchain",
 )
 
-centos_gcc_extension = module_extension(
-    implementation = _centos_gcc_extension_impl,
+autosd_10_gcc_extension = module_extension(
+    implementation = _autosd_10_gcc_extension_impl,
     tag_classes = {
         "configure": _configure_tag,
     },
-    doc = "Extension for CentOS GCC toolchain",
+    doc = "Extension for AutoSD 10 GCC toolchain",
 )

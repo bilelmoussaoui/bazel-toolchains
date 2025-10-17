@@ -9,9 +9,13 @@ bazel_dep(name = "platforms", version = "0.0.8")
 fedora_gcc_ext = use_extension("//fedora_gcc:extensions.bzl", "fedora_gcc_extension")
 use_repo(fedora_gcc_ext, "fedora_gcc_repo")
 
-# Register CentOS GCC extension
-centos_gcc_ext = use_extension("//centos_gcc:extensions.bzl", "centos_gcc_extension")
-use_repo(centos_gcc_ext, "centos_gcc_repo")
+# Register AutoSD 10 GCC extension
+autosd_10_gcc_ext = use_extension("//autosd_10_gcc:extensions.bzl", "autosd_10_gcc_extension")
+use_repo(autosd_10_gcc_ext, "autosd_10_gcc_repo")
+
+# Register AutoSD 9 GCC extension
+autosd_9_gcc_ext = use_extension("//autosd_9_gcc:extensions.bzl", "autosd_9_gcc_extension")
+use_repo(autosd_9_gcc_ext, "autosd_9_gcc_repo")
 
 # Register Host GCC extension
 host_gcc_ext = use_extension("//host_gcc:extensions.bzl", "host_gcc_extension")
@@ -20,11 +24,14 @@ use_repo(host_gcc_ext, "host_gcc_repo")
 # Note: Toolchains are not auto-registered here.
 # Users should register the specific toolchain they want in their own MODULE.bazel:
 #
-# For Fedora:
+# For Fedora 42:
 #   register_toolchains("@fedora_gcc_repo//:gcc_toolchain_linux_x86_64")
 #
-# For CentOS:
-#   register_toolchains("@centos_gcc_repo//:gcc_toolchain_linux_x86_64")
+# For AutoSD 10:
+#   register_toolchains("@autosd_10_gcc_repo//:gcc_toolchain_linux_x86_64")
+#
+# For AutoSD 9:
+#   register_toolchains("@autosd_9_gcc_repo//:gcc_toolchain_linux_x86_64")
 #
 # For Host:
 #   register_toolchains("@host_gcc_repo//:gcc_toolchain_linux_x86_64")

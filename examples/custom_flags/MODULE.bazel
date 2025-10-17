@@ -44,15 +44,28 @@ fedora_gcc.configure(
 )
 use_repo(fedora_gcc, "fedora_gcc_repo")
 
-# Configure CentOS toolchain with custom flags
-centos_gcc = use_extension("@multi_gcc_toolchain//centos_gcc:extensions.bzl", "centos_gcc_extension")
-centos_gcc.configure(
+# Configure AutoSD 10 toolchain with custom flags
+autosd_10_gcc = use_extension("@multi_gcc_toolchain//autosd_10_gcc:extensions.bzl", "autosd_10_gcc_extension")
+autosd_10_gcc.configure(
     c_flags = ["-O3", "-DNDEBUG", "-march=native"],
     cxx_flags = ["-O3", "-DNDEBUG", "-march=native", "-std=c++17"],
     link_flags = ["-flto", "-s"],
 )
-centos_gcc.configure(
+autosd_10_gcc.configure(
     c_flags = ["-DCUSTOM_DEFINE=1"],
     cxx_flags = ["-DCUSTOM_DEFINE=1"],
 )
-use_repo(centos_gcc, "centos_gcc_repo")
+use_repo(autosd_10_gcc, "autosd_10_gcc_repo")
+
+# Configure AutoSD 9 toolchain with custom flags
+autosd_9_gcc = use_extension("@multi_gcc_toolchain//autosd_9_gcc:extensions.bzl", "autosd_9_gcc_extension")
+autosd_9_gcc.configure(
+    c_flags = ["-O3", "-DNDEBUG", "-march=native"],
+    cxx_flags = ["-O3", "-DNDEBUG", "-march=native", "-std=c++17"],
+    link_flags = ["-flto", "-s"],
+)
+autosd_9_gcc.configure(
+    c_flags = ["-DCUSTOM_DEFINE=1"],
+    cxx_flags = ["-DCUSTOM_DEFINE=1"],
+)
+use_repo(autosd_9_gcc, "autosd_9_gcc_repo")
