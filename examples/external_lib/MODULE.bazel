@@ -23,6 +23,10 @@ use_repo(host_gcc, "host_gcc_repo")
 fedora_gcc = use_extension("@multi_gcc_toolchain//fedora_gcc:extensions.bzl", "fedora_gcc_extension")
 use_repo(fedora_gcc, "fedora_gcc_repo")
 
-# Configure CentOS GCC toolchain (isolated, downloads RPMs)
-centos_gcc = use_extension("@multi_gcc_toolchain//centos_gcc:extensions.bzl", "centos_gcc_extension")
-use_repo(centos_gcc, "centos_gcc_repo")
+# Configure AutoSD 10 GCC toolchain (isolated, downloads RPMs)
+autosd_10_gcc = use_extension("@multi_gcc_toolchain//autosd_10_gcc:extensions.bzl", "autosd_10_gcc_extension")
+use_repo(autosd_10_gcc, "autosd_10_gcc_repo")
+
+# Configure AutoSD 9 GCC toolchain (isolated, downloads RPMs)
+autosd_9_gcc = use_extension("@multi_gcc_toolchain//autosd_9_gcc:extensions.bzl", "autosd_9_gcc_extension")
+use_repo(autosd_9_gcc, "autosd_9_gcc_repo")

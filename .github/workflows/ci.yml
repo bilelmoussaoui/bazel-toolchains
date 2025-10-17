@@ -7,13 +7,13 @@ on:
     branches: [ main ]
 
 jobs:
-  test-toolchains:
+  test-toolchains-fedora-base:
     runs-on: ubuntu-latest
     container: fedora:latest
     strategy:
       fail-fast: false
       matrix:
-        toolchain: [host, fedora, centos]
+        toolchain: [host, fedora, autosd_10]
         example: [simple_c, external_lib, custom_flags]
 
     steps:
@@ -32,7 +32,7 @@ jobs:
         dnf install -y gcc gcc-c++ glibc-devel kernel-headers binutils
 
     - name: Install RPM toolchain dependencies
-      if: matrix.toolchain == 'fedora' || matrix.toolchain == 'centos'
+      if: matrix.toolchain == 'fedora' || matrix.toolchain == 'autosd_10'
       run: |
         dnf install -y rpm cpio libmpc binutils
 
@@ -43,11 +43,57 @@ jobs:
           bazel build //... --extra_toolchains=@${{ matrix.toolchain }}_gcc_repo//:gcc_toolchain_linux_x86_64 --sandbox_debug --verbose_failures
         elif [ "${{ matrix.toolchain }}" = "fedora" ]; then
           bazel build //... --platforms=@multi_gcc_toolchain//constraints:fedora42_x86_64 --extra_toolchains=@${{ matrix.toolchain }}_gcc_repo//:gcc_toolchain_linux_x86_64 --sandbox_debug --verbose_failures
-        elif [ "${{ matrix.toolchain }}" = "centos" ]; then
+        elif [ "${{ matrix.toolchain }}" = "autosd_10" ]; then
           bazel build //... --platforms=@multi_gcc_toolchain//constraints:autosd10_x86_64 --extra_toolchains=@${{ matrix.toolchain }}_gcc_repo//:gcc_toolchain_linux_x86_64 --sandbox_debug --verbose_failures
         fi
 
     - name: Test ${{ matrix.example }} with ${{ matrix.toolchain }} toolchain
+      run: |
+        cd examples/${{ matrix.example }}
+        # Run the built binary to ensure it works
+        if [ "${{ matrix.example }}" = "simple_c" ]; then
+          ./bazel-bin/hello
+          ./bazel-bin/hello_static arg1 arg2
+        elif [ "${{ matrix.example }}" = "external_lib" ]; then
+          ./bazel-bin/json_demo
+          ./bazel-bin/json_demo_static
+        elif [ "${{ matrix.example }}" = "custom_flags" ]; then
+          ./bazel-bin/custom_flags_demo
+          ./bazel-bin/custom_flags_demo_cpp
+        fi
+
+  test-autosd9-ubuntu-base:
+    runs-on: ubuntu-latest
+    container: ubuntu:22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [simple_c, external_lib, custom_flags]
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Update system and install dependencies
+      run: |
+        apt-get update
+        apt-get install -y curl gnupg software-properties-common
+
+    - name: Install Bazel
+      run: |
+        curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > /usr/share/keyrings/bazel-archive-keyring.gpg
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
+        apt-get update && apt-get install -y bazel
+
+    - name: Install RPM toolchain dependencies
+      run: |
+        apt-get install -y rpm2cpio cpio ca-certificates
+
+    - name: Build ${{ matrix.example }} with AutoSD 9 toolchain
+      run: |
+        cd examples/${{ matrix.example }}
+        bazel build //... --platforms=@multi_gcc_toolchain//constraints:autosd9_x86_64 --extra_toolchains=@autosd_9_gcc_repo//:gcc_toolchain_linux_x86_64 --sandbox_debug --verbose_failures
+
+    - name: Test ${{ matrix.example }} with AutoSD 9 toolchain
       run: |
         cd examples/${{ matrix.example }}
         # Run the built binary to ensure it works

@@ -1,0 +1,26 @@
+# AutoSD 10 GCC Toolchain
+# This package provides an isolated GCC toolchain built from AutoSD 10 (CentOS Stream 10) RPM packages
+
+package(default_visibility = ["//visibility:public"])
+
+# Export the extension for use by other modules
+exports_files([
+    "extensions.bzl",
+])
+
+# Convenience aliases to the generated toolchain
+alias(
+    name = "gcc_toolchain",
+    actual = "@autosd_10_gcc_repo//:gcc_toolchain",
+)
+
+# Architecture-specific toolchain aliases
+alias(
+    name = "gcc_toolchain_linux_x86_64",
+    actual = "@autosd_10_gcc_repo//:gcc_toolchain_linux_x86_64",
+)
+
+alias(
+    name = "gcc_toolchain_linux_aarch64",
+    actual = "@autosd_10_gcc_repo//:gcc_toolchain_linux_aarch64",
+)
