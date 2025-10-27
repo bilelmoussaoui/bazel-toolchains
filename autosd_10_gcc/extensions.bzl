@@ -15,44 +15,44 @@ _AUTOSD_RELEASE = "10"
 _PACKAGES_BY_ARCH = {
     "x86_64": {
         "gcc": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "3e6df20e46bc865078ea82707459405863f0969f82f3e7bc1f59eafa5acbf47d",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "ece43ba0e34ff0513dfdd13fc41355c88f28b7e4f675a9c1e16c43f3efdcda64",
         },
         "gcc-c++": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "59f34694a0729f483e875bb57974fcd49afb09690edba1377f991fb0a57ae0b9",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "d5bee4d8b00c8dde8e826ec160e39de4424e62cf713a9ba18d92a23b87917c54",
         },
         "cpp": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "3e162eb077cc33d8664a97b9c45c314e64ff06d7821a354b7a6782cb41266283",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "6a23043713d8027c658133310b6d878a86af26e36ad05328ec0f405f1facff1b",
         },
         "binutils": {
             "version": "2.41-58.el10",
             "sha256": "2deab9e4aa6fe34dea2d6e312c4a6d48a02288e627e94594b497397365e50712",
         },
         "glibc-devel": {
-            "version": "2.39-65.el10",
-            "sha256": "9f9dac005fe4a0c6d9c9d1a61c5b899873dd693bf975e458e99a2faef98ef4dc",
+            "version": "2.39-69.el10",
+            "sha256": "c0059b0f12ba7168d71ed53620732107614e7dfb660aa9d14f763bc48006f5b7",
         },
         "libstdc++-devel": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "ba6188f734d3790b4eb103eea64680d4488d093bedfcc861dae6c20e77897576",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "ad622697cf23df121db3d6ba1133a6f37a122038e8d447813f3c8645b872446c",
         },
         "libstdc++": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "7354b93fde7d2048cee214534462f5d01fb6f772cc80b3740296dd54b2b551e6",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "c0868f811d6b8a9cbc77f6c93dbdd1114e21699edf578eea083ee27c2a6b0b46",
         },
         "kernel-headers": {
-            "version": "6.12.0-135.el10",
-            "sha256": "54d5e6870faae2510995ac982421c12ee19b610682de15bc3ddb6465ebf576a3",
+            "version": "6.12.0-144.el10",
+            "sha256": "e505cf8ddb466b90a65416db7e75145dde2905eaceeeaf5f4b98c71bd3ed4b80",
         },
         "glibc": {
-            "version": "2.39-65.el10",
-            "sha256": "03f6918fdf323779382a549e62f853f5e5d8ecafacf9f992fe362e9a86886616",
+            "version": "2.39-69.el10",
+            "sha256": "8f7bc6fc34babf8609af6ac13953babcff88d819617ebb046863aa28a5db18d3",
         },
         "libgcc": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "7ac815d3fff13c6254f82c4703e1f97063bf6246a8b41c34eb96d58d42f3462b",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "96a64df25761b109296eeed6bf14f0b827de986956a47d25078d0c04340a5b19",
         },
         "libmpc": {
             "version": "1.3.1-7.el10",
@@ -69,44 +69,44 @@ _PACKAGES_BY_ARCH = {
     },
     "aarch64": {
         "gcc": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "7bc956fbce76bd85659de562e0d7c32d2938eeec82dd1aa2679a8e3670fd177c",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "4340f6ef5e701b218e7f04a82828dedb813bab03b76c92d40da2caac373f1f57",
         },
         "gcc-c++": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "6774dbdc312d7b9a1c8dff3901d4e8c467da6d1a9df501f3fda1a829040aa665",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "6112cf4c998f17ed05c034bcabcad6a630735d75586619fb186fd1da2c0a066e",
         },
         "cpp": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "ce16b5946d6a4bdd1bf06d1ef44753449425facbf522c32cb2223e7c222305b4",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "b1a2a2b5937b95baa95588c3938d64829c71abf9328d2697e4560aa4a240137f",
         },
         "binutils": {
             "version": "2.41-58.el10",
             "sha256": "5cda10bb09dba160cbfd8f629eb308bcb203df2468821afb1c2b51aed45cd8a7",
         },
         "glibc-devel": {
-            "version": "2.39-65.el10",
-            "sha256": "dfb688da246848a7a8e38be59b1e828794e190ca14a4a168ed215e20ff963832",
+            "version": "2.39-69.el10",
+            "sha256": "2eaad4365509547e1519ce55cd2c7e8d7b5cc42ef784c1feaddbbe547f385211",
         },
         "libstdc++-devel": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "2315d11ff83989759d92115774924524a8bfa880daa3357d9155ed52d8578a70",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "0b4482a4b1134da4f4bbd5bc9552d4e6fe97419df13533e07e2bbe72836b6fb5",
         },
         "libstdc++": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "f5040f18ff5ad47dd7c39b08d82172c6fb69c37590c5a01fba3cfa294698f92c",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "9204d7de574e0e1b16ebf114dcd7922c59a33ae1568b72ec6e49d1d02dbf06f3",
         },
         "kernel-headers": {
-            "version": "6.12.0-135.el10",
-            "sha256": "5a75e7fd8fc9c5eb8c98c4403b173716d8e7c551c30d8b02a4ae0b9b3f2f6c56",
+            "version": "6.12.0-144.el10",
+            "sha256": "19981c024b156d271a0a3026d3d324bff55158822d15a5298642c1536b262b50",
         },
         "glibc": {
-            "version": "2.39-65.el10",
-            "sha256": "72b4fed5b009f3afff32005c6720f334fad8e068225832ddeba15c9c2ea78034",
+            "version": "2.39-69.el10",
+            "sha256": "37f39e57d65bc469c49ec3614541fe8b20d16202e1770577e03e9b06cab23ef8",
         },
         "libgcc": {
-            "version": "14.3.1-2.1.el10",
-            "sha256": "9ba86ec9a341cb262d094c06f0759a2aae1e34c00e8d3a5c0821d40afe3bf598",
+            "version": "14.3.1-2.3.el10",
+            "sha256": "392c0f450ffb7d91f405f71b8c4ea531aaf5223542d7deced2602d70b4644a22",
         },
         "libmpc": {
             "version": "1.3.1-7.el10",
@@ -120,7 +120,6 @@ _PACKAGES_BY_ARCH = {
             "version": "4.2.1-5.el10",
             "sha256": "30067f4b30700a4dbe21ee5ce458f3a6ab41b7a419b8be572e21967316877b10",
         },
-
     },
 }
 
@@ -146,7 +145,7 @@ def _autosd_10_gcc_toolchain_impl(repository_ctx):
 
     # Use shared download and extraction logic
     # AutoSD 10 uses CentOS Stream 10 URL structure - no subpath needed
-    base_url_template = "https://autosd.sig.centos.org/AutoSD-{release}/nightly/repos/AutoSD/compose/AutoSD/{arch}/os/Packages/{pkg_name}-{version}.{arch}.rpm"
+    base_url_template = "https://download.autosd.sig.centos.org/AutoSD-{release}/nightly/repos/AutoSD/compose/AutoSD/{arch}/os/Packages/{pkg_name}-{version}.{arch}.rpm"
     download_and_extract_packages(repository_ctx, packages, base_url_template, _AUTOSD_RELEASE, rpm_arch, "AutoSD {}".format(_AUTOSD_RELEASE))
 
     # Use shared GCC version detection
