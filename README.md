@@ -119,20 +119,19 @@ register_toolchains("@host_gcc_repo//:gcc_toolchain_linux_x86_64")
 
 ## 🔧 Updating Package Versions
 
-Use the unified update script to fetch the latest package versions and SHA256 hashes:
+Use the unified update script to automatically fetch the latest package versions and SHA256 hashes for all supported distributions and architectures:
 
 ```bash
-# For Fedora 42
-python3 update_packages.py fedora 42 x86_64
-
-# For AutoSD 10 (CentOS Stream 10)
-python3 update_packages.py centos 10 x86_64
-
-# For AutoSD 9 (CentOS Stream 9)
-python3 update_packages.py centos 9 x86_64
+python3 update_packages.py
 ```
 
-Copy the output into the respective `extensions.bzl` file.
+This will:
+- Fetch packages for Fedora 42 (x86_64, aarch64)
+- Fetch packages for AutoSD 10 (x86_64, aarch64)
+- Fetch packages for AutoSD 9 (x86_64)
+- Generate a `package_versions.json` file with all package information
+
+You can then use the JSON output to update the respective `extensions.bzl` files.
 
 ## ✅ Status
 

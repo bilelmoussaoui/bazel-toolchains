@@ -31,3 +31,6 @@ Thumbs.db
 *.temp
 .tmp/
 temp/
+
+# Generated package information
+package_versions.json
