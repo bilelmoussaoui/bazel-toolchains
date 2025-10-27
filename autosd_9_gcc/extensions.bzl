@@ -31,8 +31,8 @@ _PACKAGES_BY_ARCH = {
             "sha256": "1f8dd90e7b2f751fbb3d0273356856ea5321c9e6e7036e0e83d3545e17a15171",
         },
         "glibc-devel": {
-            "version": "2.34-213.el9",
-            "sha256": "placeholder_sha256_for_glibc_devel",
+            "version": "2.34-237.el9",
+            "sha256": "18392260e65abfebdcd53433d75fc2c8d89dd9f479b203856a18b748ba18d9ea",
         },
         "libstdc++-devel": {
             "version": "11.5.0-11.el9",
@@ -43,12 +43,12 @@ _PACKAGES_BY_ARCH = {
             "sha256": "b17a28146ed5785049f59c22c7c93839f3d8f9c0ea860d8a5657c2d006c09718",
         },
         "kernel-headers": {
-            "version": "5.14.0-540.el9",
-            "sha256": "placeholder_sha256_for_kernel_headers",
+            "version": "5.14.0-629.el9",
+            "sha256": "944a55cc65a1ba3d56d4c3190f24c25999867d3b21d9262d62a2898e97dc7983",
         },
         "glibc": {
-            "version": "2.34-213.el9",
-            "sha256": "placeholder_sha256_for_glibc",
+            "version": "2.34-237.el9",
+            "sha256": "c80a36acd04d881699c19f8dc9157c7e616a570f5f5915453a38c31574c73089",
         },
         "libgcc": {
             "version": "11.5.0-11.el9",
