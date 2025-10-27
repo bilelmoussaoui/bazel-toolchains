@@ -66,6 +66,10 @@ _PACKAGES_BY_ARCH = {
             "version": "4.1.0-7.el9",
             "sha256": "179760104aa5a31ca463c586d0f21f380ba4d0eed212eee91bd1ca513e5d7a8d",
         },
+        "glibc-headers": {
+            "version": "2.34-237.el9",
+            "sha256": "9a34165d1a4801010e5cf184490c37fed703a036df08f2cbe811c58f495de579"
+        },
     },
 }
 
