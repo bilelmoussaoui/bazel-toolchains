@@ -98,6 +98,16 @@ def _autosd_9_gcc_toolchain_impl(repository_ctx):
     base_url_template = "https://autosd.sig.centos.org/AutoSD-{release}/nightly/repos/AutoSD/compose/AutoSD/{arch}/os/Packages/{pkg_name}-{version}.{arch}.rpm"
     download_and_extract_packages(repository_ctx, packages, base_url_template, _AUTOSD_RELEASE, rpm_arch, "AutoSD {}".format(_AUTOSD_RELEASE))
 
+
+    # ==================================================================================
+    # BINUTILS COMPATIBILITY FIXES
+    # ==================================================================================
+    # Some distributions (e.g., AutoSD 9) don't include /usr/bin/ld as a separate file,
+    # only /usr/bin/ld.bfd. Create a symlink to ensure compatibility.
+    if repository_ctx.path("usr/bin/ld.bfd").exists and not repository_ctx.path("usr/bin/ld").exists:
+        repository_ctx.symlink("usr/bin/ld.bfd", "usr/bin/ld")
+        print("Created symlink usr/bin/ld -> usr/bin/ld.bfd for compatibility")
+
     # Use shared GCC version detection
     gcc_version, gcc_major = detect_gcc_version(repository_ctx)
 
