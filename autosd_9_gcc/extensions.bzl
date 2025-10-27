@@ -108,6 +108,39 @@ def _autosd_9_gcc_toolchain_impl(repository_ctx):
         repository_ctx.symlink("usr/bin/ld.bfd", "usr/bin/ld")
         print("Created symlink usr/bin/ld -> usr/bin/ld.bfd for compatibility")
 
+    # ==================================================================================
+    # AUTOSD 9 SPECIFIC: LINKER SCRIPT PATCHING
+    # ==================================================================================
+    # Fix linker scripts that contain absolute paths. In AutoSD 9, many .so files in
+    # /usr/lib64 are actually linker scripts (text files) that contain absolute paths
+    # like /lib64/libm.so.6. These absolute paths bypass --sysroot and cause linking
+    # to fail. We need to rewrite them to use relative paths within the sysroot.
+
+    repository_ctx.execute([
+        "bash", "-c",
+        """
+        find usr/lib64 usr/lib -name '*.so' -type f 2>/dev/null | while read f; do
+          # Check if it's a linker script by looking for "GNU ld script" or if it's small text
+          if head -c 1024 "$f" 2>/dev/null | grep -q "GNU ld script"; then
+            echo "Found linker script: $f"
+            # Use sed to replace absolute paths with sysroot-relative paths
+            # The = prefix makes paths relative to the sysroot in GCC/LD
+            sed -i \\
+              -e 's|/usr/lib64/|=/usr/lib64/|g' \\
+              -e 's|/usr/lib/|=/usr/lib/|g' \\
+              -e 's| /lib64/| =/lib64/|g' \\
+              -e 's|^/lib64/|=/lib64/|g' \\
+              -e 's|(/lib64/|(=/lib64/|g' \\
+              -e 's| /lib/| =/lib/|g' \\
+              -e 's|^/lib/|=/lib/|g' \\
+              -e 's|(/lib/|(=/lib/|g' \\
+              "$f"
+            echo "---"
+          fi
+        done
+        """
+    ])
+
     # Use shared GCC version detection
     gcc_version, gcc_major = detect_gcc_version(repository_ctx)
 
