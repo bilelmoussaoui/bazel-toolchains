@@ -6,7 +6,8 @@ RUN dnf update -y && \
         ca-certificates \
         unzip \
         which \
-        libstdc++ \
+        libstdc++  \
+        java-21-openjdk-devel \
         gcc \
         gcc-c++ \
         cpp \
@@ -14,13 +15,19 @@ RUN dnf update -y && \
         glibc-devel \
         libstdc++-devel \
         kernel-headers \
-        glibc
+        glibc \
+        git \
+        rpm-build
 
-RUN wget https://github.com/bazelbuild/bazel/releases/download/7.6.2/bazel-7.6.2-installer-linux-x86_64.sh
-RUN chmod +x ./bazel-7.6.2-installer-linux-x86_64.sh && ./bazel-7.6.2-installer-linux-x86_64.sh
-RUN rm -f ./bazel-7.6.2-installer-linux-x86_64.sh
+RUN wget https://github.com/bazelbuild/bazel/releases/download/8.3.0/bazel-8.3.0-installer-linux-x86_64.sh
+RUN chmod +x ./bazel-8.3.0-installer-linux-x86_64 && ./bazel-8.3.0-installer-linux-x86_64
+RUN rm -f ./bazel-8.3.0-installer-linux-x86_64
+
+RUN mkdir -p /usr/local/lib/bazel/bin
+RUN ln -s /usr/local/bin/bazel /usr/local/lib/bazel/bin/bazel-8.3.0-linux-x86_64
 
 RUN bazel --help
 
+ENV PATH="/usr/local/lib/bazel/bin:${PATH}"
 
 CMD ["/bin/bash"]
