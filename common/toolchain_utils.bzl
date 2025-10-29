@@ -231,13 +231,13 @@ def download_and_extract_packages(repository_ctx, packages, base_url_template, r
 
         # Check if the tool exists before creating a wrapper (some tools may not be in all packages)
         if repository_ctx.path(tool_path).exists:
-            wrapper_content = """#!/bin/bash
+            wrapper_content = """#!/bin/sh
 # Wrapper for {} to set library path for extracted toolchain
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 REPO_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
 # Only add specific toolchain libraries, not the entire lib directory
-export LD_LIBRARY_PATH="$REPO_ROOT/usr/lib64/toolchain:$LD_LIBRARY_PATH"
-exec "$REPO_ROOT/usr/bin/{}_original" "$@"
+# Use env to set LD_LIBRARY_PATH only for the exec'd command, not for the shell itself
+exec env LD_LIBRARY_PATH="$REPO_ROOT/usr/lib64/toolchain:$LD_LIBRARY_PATH" "$REPO_ROOT/usr/bin/{}_original" "$@"
 """.format(tool, tool)
 
             repository_ctx.file(wrapper_path, wrapper_content, executable=True)
