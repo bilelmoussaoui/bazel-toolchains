@@ -13,7 +13,9 @@ from typing import Dict, Optional
 import json
 
 
-def get_fedora_package_info(fedora_release: str, arch: str, package_name: str) -> Optional[Dict]:
+def get_fedora_package_info(
+    fedora_release: str, arch: str, package_name: str
+) -> Optional[Dict]:
     """
     Query Fedora repositories for package information using directory listing approach.
     """
@@ -23,13 +25,13 @@ def get_fedora_package_info(fedora_release: str, arch: str, package_name: str) -
     try:
         listing_url = f"{base_url}/{subpath}/"
         request = urllib.request.Request(listing_url)
-        request.add_header('User-Agent', 'Multi-GCC-Toolchain-Updater/1.0')
+        request.add_header("User-Agent", "Multi-GCC-Toolchain-Updater/1.0")
 
         with urllib.request.urlopen(request) as response:
             html_content = response.read().decode()
 
         # Parse HTML to find package files
-        pattern = rf'{re.escape(package_name)}-([^-]+)-([^-]+)\.fc{fedora_release}\.{arch}\.rpm'
+        pattern = rf"{re.escape(package_name)}-([^-]+)-([^-]+)\.fc{fedora_release}\.{arch}\.rpm"
         matches = re.findall(pattern, html_content)
 
         if matches:
@@ -41,11 +43,11 @@ def get_fedora_package_info(fedora_release: str, arch: str, package_name: str) -
             download_url = f"{base_url}/{subpath}/{rpm_filename}"
 
             return {
-                'name': package_name,
-                'version': full_version,
-                'subpath': subpath,
-                'url': download_url,
-                'filename': rpm_filename
+                "name": package_name,
+                "version": full_version,
+                "subpath": subpath,
+                "url": download_url,
+                "filename": rpm_filename,
             }
 
     except Exception as e:
@@ -54,7 +56,9 @@ def get_fedora_package_info(fedora_release: str, arch: str, package_name: str) -
     return None
 
 
-def get_centos_package_info(centos_release: str, arch: str, package_name: str) -> Optional[Dict]:
+def get_centos_package_info(
+    centos_release: str, arch: str, package_name: str
+) -> Optional[Dict]:
     """
     Query AutoSD repositories for package information using directory listing approach.
     AutoSD packages are in the AutoSD compose repository.
@@ -67,21 +71,21 @@ def get_centos_package_info(centos_release: str, arch: str, package_name: str) -
         # Use listing URL to get package information
         listing_url = f"{listing_base_url}/"
         request = urllib.request.Request(listing_url)
-        request.add_header('User-Agent', 'Multi-GCC-Toolchain-Updater/1.0')
+        request.add_header("User-Agent", "Multi-GCC-Toolchain-Updater/1.0")
 
         with urllib.request.urlopen(request) as response:
             html_content = response.read().decode()
 
         # Parse HTML to find package files
-        soup = BeautifulSoup(html_content, 'html.parser')
+        soup = BeautifulSoup(html_content, "html.parser")
 
-        links = soup.select('pre a')
+        links = soup.select("pre a")
         # Loop through all the found links
         for link in links:
             filename = link.text
             # Use a simple regex to check if the filename ends with '.rpm'
             if filename.endswith(".rpm"):
-                pattern = rf'^{re.escape(package_name)}-(.*)-([^\-]+)\.el{centos_release}\.{arch}\.rpm$'
+                pattern = rf"^{re.escape(package_name)}-(.*)-([^\-]+)\.el{centos_release}\.{arch}\.rpm$"
                 matches = re.findall(pattern, filename)
 
                 if matches:
@@ -94,10 +98,10 @@ def get_centos_package_info(centos_release: str, arch: str, package_name: str) -
                     download_url = f"{download_base_url}/{rpm_filename}"
 
                     return {
-                        'name': package_name,
-                        'version': full_version,
-                        'url': download_url,
-                        'filename': rpm_filename
+                        "name": package_name,
+                        "version": full_version,
+                        "url": download_url,
+                        "filename": rpm_filename,
                     }
 
     except Exception as e:
@@ -114,7 +118,7 @@ def get_sha256_from_url(url: str) -> Optional[str]:
 
     try:
         request = urllib.request.Request(url)
-        request.add_header('User-Agent', 'Multi-GCC-Toolchain-Updater/1.0')
+        request.add_header("User-Agent", "Multi-GCC-Toolchain-Updater/1.0")
 
         with urllib.request.urlopen(request) as response:
             sha256_hash = hashlib.sha256()
@@ -133,51 +137,68 @@ def get_sha256_from_url(url: str) -> Optional[str]:
 def main():
     # Essential packages we need (base list for all distributions)
     base_package_names = [
-        'gcc',
-        'gcc-c++',
-        'cpp',
-        'binutils',
-        'glibc-devel',
-        'libstdc++-devel',
-        'libstdc++',
-        'kernel-headers',
-        'glibc',
-        'libgcc',
-        'libmpc',
-        'gmp',
-        'mpfr',
+        "gcc",
+        "gcc-c++",
+        "cpp",
+        "binutils",
+        "glibc-devel",
+        "libstdc++-devel",
+        "libstdc++",
+        "kernel-headers",
+        "glibc",
+        "libgcc",
+        "libmpc",
+        "gmp",
+        "mpfr",
     ]
 
     # Configuration for all supported distributions and architectures
     configs = [
-        {'distro': 'fedora', 'release': '42', 'arches': ['x86_64', 'aarch64'], 'packages': base_package_names},
-        {'distro': 'centos', 'release': '10', 'arches': ['x86_64', 'aarch64'], 'name': 'autosd_10', 'packages': base_package_names},
-        {'distro': 'centos', 'release': '9', 'arches': ['x86_64', 'aarch64'], 'name': 'autosd_9', 'packages': base_package_names + ['glibc-headers']},
+        {
+            "distro": "fedora",
+            "release": "42",
+            "arches": ["x86_64", "aarch64"],
+            "packages": base_package_names,
+        },
+        {
+            "distro": "centos",
+            "release": "10",
+            "arches": ["x86_64", "aarch64"],
+            "name": "autosd_10",
+            "packages": base_package_names,
+        },
+        {
+            "distro": "centos",
+            "release": "9",
+            "arches": ["x86_64", "aarch64"],
+            "name": "autosd_9",
+            "packages": base_package_names + ["glibc-headers"],
+        },
     ]
 
     all_results = {}
 
     for config in configs:
-        distro = config['distro']
-        release = config['release']
-        distro_name = config.get('name', distro)
-        package_names = config['packages']
+        distro = config["distro"]
+        release = config["release"]
+        distro_name = config.get("name", distro)
+        package_names = config["packages"]
 
         all_results[distro_name] = {}
 
         # Choose the appropriate function based on distribution
-        if distro == 'fedora':
+        if distro == "fedora":
             get_package_info = get_fedora_package_info
-        elif distro == 'centos':
+        elif distro == "centos":
             get_package_info = get_centos_package_info
         else:
             print(f"Error: Unknown distribution: {distro}")
             continue
 
-        for arch in config['arches']:
-            print(f"\n{'='*80}")
+        for arch in config["arches"]:
+            print(f"\n{'=' * 80}")
             print(f"Fetching {distro_name} {release} ({arch})...")
-            print(f"{'='*80}")
+            print(f"{'=' * 80}")
 
             packages_info = {}
 
@@ -189,16 +210,20 @@ def main():
 
                 if info:
                     # Get SHA256 hash
-                    sha256 = get_sha256_from_url(info['url'])
+                    sha256 = get_sha256_from_url(info["url"])
                     if sha256:
                         packages_info[package_name] = {
-                            'version': info['version'],
-                            'sha256': sha256,
+                            "version": info["version"],
+                            "sha256": sha256,
                         }
-                        if distro == 'fedora':
-                            packages_info[package_name]['subpath'] = info['subpath']
+                        if distro == "fedora":
+                            packages_info[package_name]["subpath"] = info[
+                                "subpath"
+                            ]
 
-                        print(f"  ✓ {package_name}: {info['version']} (SHA256: {sha256[:16]}...)")
+                        print(
+                            f"  ✓ {package_name}: {info['version']} (SHA256: {sha256[:16]}...)"
+                        )
                     else:
                         print(f"  ✗ Failed to get SHA256 for {package_name}")
                 else:
@@ -206,18 +231,22 @@ def main():
 
             if packages_info:
                 all_results[distro_name][arch] = packages_info
-                print(f"\n✓ Successfully processed {len(packages_info)} packages for {distro_name} {arch}")
+                print(
+                    f"\n✓ Successfully processed {len(packages_info)} packages for {distro_name} {arch}"
+                )
             else:
-                print(f"\n✗ No packages were successfully processed for {distro_name} {arch}")
+                print(
+                    f"\n✗ No packages were successfully processed for {distro_name} {arch}"
+                )
 
     # Write JSON output
-    output_file = 'package_versions.json'
-    with open(output_file, 'w') as f:
+    output_file = "package_versions.json"
+    with open(output_file, "w") as f:
         json.dump(all_results, f, indent=2)
 
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print(f"✓ All package information written to {output_file}")
-    print(f"{'='*80}")
+    print(f"{'=' * 80}")
 
     # Print summary
     print("\nSummary:")
@@ -229,5 +258,5 @@ def main():
     print("You can now use this file to update the extensions.bzl files.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
