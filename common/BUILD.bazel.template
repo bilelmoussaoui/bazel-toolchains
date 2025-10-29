@@ -34,6 +34,7 @@ filegroup(
         "usr/bin/ld",
         "usr/bin/ld.bfd",
     ] + glob([
+        "usr/bin/ld.bfd.real",
         "usr/lib64/**/*.so*",
         "usr/lib64/**/*.a",
         "usr/lib/**/*.so*",

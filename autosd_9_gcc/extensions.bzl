@@ -162,6 +162,22 @@ def _autosd_9_gcc_toolchain_impl(repository_ctx):
         repository_ctx.symlink("usr/bin/ld.bfd", "usr/bin/ld")
         print("Created symlink usr/bin/ld -> usr/bin/ld.bfd for compatibility")
 
+    # Create a wrapper for ld.bfd that sets LD_LIBRARY_PATH to find libctf.so.0 and other binutils libraries
+    # This is needed because ld.bfd is dynamically linked and needs to find its shared libraries
+    if repository_ctx.path("usr/bin/ld.bfd").exists:
+        ld_bfd_wrapper_content = """#!/bin/bash
+# Wrapper for ld.bfd to set LD_LIBRARY_PATH for binutils shared libraries
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+REPO_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
+export LD_LIBRARY_PATH="$REPO_ROOT/usr/lib64:$REPO_ROOT/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+exec "$REPO_ROOT/usr/bin/ld.bfd.real" "$@"
+"""
+        repository_ctx.file("usr/bin/ld.bfd.wrapper", ld_bfd_wrapper_content, executable = True)
+        # Rename the actual ld.bfd to ld.bfd.real and replace it with the wrapper
+        repository_ctx.execute(["mv", "usr/bin/ld.bfd", "usr/bin/ld.bfd.real"])
+        repository_ctx.execute(["mv", "usr/bin/ld.bfd.wrapper", "usr/bin/ld.bfd"])
+        print("Created LD_LIBRARY_PATH wrapper for ld.bfd")
+
     # ==================================================================================
     # AUTOSD 9 SPECIFIC: LINKER SCRIPT PATCHING
     # ==================================================================================
