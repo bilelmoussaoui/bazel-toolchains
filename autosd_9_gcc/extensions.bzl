@@ -43,8 +43,8 @@ _PACKAGES_BY_ARCH = {
             "sha256": "b17a28146ed5785049f59c22c7c93839f3d8f9c0ea860d8a5657c2d006c09718",
         },
         "kernel-headers": {
-            "version": "5.14.0-629.el9",
-            "sha256": "944a55cc65a1ba3d56d4c3190f24c25999867d3b21d9262d62a2898e97dc7983",
+            "version": "5.14.0-630.el9",
+            "sha256": "79b4516fe8ec02daa4f01482f28fd5737a78bf06ffc755a29c1f11f9e667116d",
         },
         "glibc": {
             "version": "2.34-237.el9",
@@ -68,9 +68,63 @@ _PACKAGES_BY_ARCH = {
         },
         "glibc-headers": {
             "version": "2.34-237.el9",
-            "sha256": "9a34165d1a4801010e5cf184490c37fed703a036df08f2cbe811c58f495de579"
-        },
+            "sha256": "9a34165d1a4801010e5cf184490c37fed703a036df08f2cbe811c58f495de579",
+        }
     },
+    "aarch64": {
+        "gcc": {
+            "version": "11.5.0-11.el9",
+            "sha256": "da7237a7951b9f86eb147f4d369005f9b39025de9101656090a36ea1a6cd3eaa",
+        },
+        "gcc-c++": {
+            "version": "11.5.0-11.el9",
+            "sha256": "69fd1cb2fa681ade63ade1c93802bda31a163601bb1e2bfa88a61f3b5bd5fe14",
+        },
+        "cpp": {
+            "version": "11.5.0-11.el9",
+            "sha256": "877828f0d889456660d81dcbd39178d3565fb9021fb2193742e3354eeb959eb8",
+        },
+        "binutils": {
+            "version": "2.35.2-67.el9",
+            "sha256": "30587742570a9ef33fdaf35f72c9bca2f6a0953eeb838fab573f6124c9ce4c83",
+        },
+        "glibc-devel": {
+            "version": "2.34-237.el9",
+            "sha256": "cb0f0030a787bfb3457d7818933435646c8226516da8e559adc5613394256f98",
+        },
+        "libstdc++-devel": {
+            "version": "11.5.0-11.el9",
+            "sha256": "4c00c380007f2268fc7e12c0284528fd88a3da0ab23760442ee5557b3e2b690c",
+        },
+        "libstdc++": {
+            "version": "11.5.0-11.el9",
+            "sha256": "902d9be36b2954dae978a7f78437a1d69ead7c5a5e5e8d50c0bf187bf7aa6e8e",
+        },
+        "kernel-headers": {
+            "version": "5.14.0-630.el9",
+            "sha256": "31fa6a3f5bee9ed2e39833480d1f57673a448578e3ad0b9d60f4fce76795d236",
+        },
+        "glibc": {
+            "version": "2.34-237.el9",
+            "sha256": "53df8f2e39747130cf212977d943511dee0a461077380531ba69fc981a795b3a",
+        },
+        "libgcc": {
+            "version": "11.5.0-11.el9",
+            "sha256": "15a092304284044140344654776281f26ebb8a11d252de71fed7e49bc9b51663",
+        },
+        "libmpc": {
+            "version": "1.2.1-4.el9",
+            "sha256": "489bd89037b1a77d696e391315c740f185e6447aacdb1d7fe84b411491c34b88",
+        },
+        "gmp": {
+            "version": "6.2.0-13.el9",
+            "sha256": "01716c2de2af5ddce80cfc2f81fbcabe50670583f8d3ebf8af1058982edb9c70",
+        },
+        "mpfr": {
+            "version": "4.1.0-7.el9",
+            "sha256": "f3bd8510505a53450abe05dc34edbc5313fe89a6f88d0252624205dc7bb884c7",
+        }
+    }
 }
 
 def _autosd_9_gcc_toolchain_impl(repository_ctx):

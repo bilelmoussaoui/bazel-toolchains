@@ -152,7 +152,7 @@ def main():
     configs = [
         {'distro': 'fedora', 'release': '42', 'arches': ['x86_64', 'aarch64'], 'packages': base_package_names},
         {'distro': 'centos', 'release': '10', 'arches': ['x86_64', 'aarch64'], 'name': 'autosd_10', 'packages': base_package_names},
-        {'distro': 'centos', 'release': '9', 'arches': ['x86_64'], 'name': 'autosd_9', 'packages': base_package_names + ['glibc-headers']},
+        {'distro': 'centos', 'release': '9', 'arches': ['x86_64', 'aarch64'], 'name': 'autosd_9', 'packages': base_package_names + ['glibc-headers']},
     ]
 
     all_results = {}
