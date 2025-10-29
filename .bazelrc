@@ -33,3 +33,13 @@ build:fedora --platforms=//constraints:fedora42_x86_64
 build:fedora_aarch64 --extra_toolchains=@fedora_gcc_repo//:gcc_toolchain_linux_aarch64
 build:fedora_aarch64 --host_platform=//constraints:fedora42_aarch64
 build:fedora_aarch64 --platforms=//constraints:fedora42_aarch64
+
+# Host toolchain configuration (x86_64)
+build:host --extra_toolchains=@host_gcc_repo//:gcc_toolchain_linux_x86_64
+build:host --host_platform=//constraints:host_x86_64
+build:host --platforms=//constraints:host_x86_64
+
+# Host toolchain configuration (aarch64)
+build:host_aarch64 --extra_toolchains=@host_gcc_repo//:gcc_toolchain_linux_aarch64
+build:host_aarch64 --host_platform=//constraints:host_aarch64
+build:host_aarch64 --platforms=//constraints:host_aarch64

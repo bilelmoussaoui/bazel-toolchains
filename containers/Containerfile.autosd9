@@ -1,0 +1,20 @@
+FROM quay.io/centos/centos:stream9
+
+RUN dnf update -y && \
+    dnf install -y \
+        wget \
+        ca-certificates \
+        unzip \
+        which \
+        libstdc++ \
+        rpm \
+        cpio 
+
+RUN wget https://github.com/bazelbuild/bazel/releases/download/7.6.2/bazel-7.6.2-installer-linux-x86_64.sh
+RUN chmod +x ./bazel-7.6.2-installer-linux-x86_64.sh && ./bazel-7.6.2-installer-linux-x86_64.sh
+RUN rm -f ./bazel-7.6.2-installer-linux-x86_64.sh
+
+RUN bazel --help
+
+
+CMD ["/bin/bash"]
