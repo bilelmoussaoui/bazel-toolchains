@@ -20,8 +20,8 @@ RUN dnf update -y && \
         rpm-build
 
 RUN wget https://github.com/bazelbuild/bazel/releases/download/8.3.0/bazel-8.3.0-installer-linux-x86_64.sh
-RUN chmod +x ./bazel-8.3.0-installer-linux-x86_64 && ./bazel-8.3.0-installer-linux-x86_64
-RUN rm -f ./bazel-8.3.0-installer-linux-x86_64
+RUN chmod +x ./bazel-8.3.0-installer-linux-x86_64.sh && ./bazel-8.3.0-installer-linux-x86_64.sh
+RUN rm -f ./bazel-8.3.0-installer-linux-x86_64.sh
 
 RUN mkdir -p /usr/local/lib/bazel/bin
 RUN ln -s /usr/local/bin/bazel /usr/local/lib/bazel/bin/bazel-8.3.0-linux-x86_64
