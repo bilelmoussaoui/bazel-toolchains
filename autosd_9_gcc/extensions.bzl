@@ -169,8 +169,9 @@ def _autosd_9_gcc_toolchain_impl(repository_ctx):
 # Wrapper for ld.bfd to set LD_LIBRARY_PATH for binutils shared libraries
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 REPO_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
+# Only add the toolchain-specific library directory, NOT the full lib64 (which contains libc)
 # Use env to set LD_LIBRARY_PATH only for the exec'd command, not for the shell itself
-exec env LD_LIBRARY_PATH="$REPO_ROOT/usr/lib64:$REPO_ROOT/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" "$REPO_ROOT/usr/bin/ld.bfd.real" "$@"
+exec env LD_LIBRARY_PATH="$REPO_ROOT/usr/lib64/toolchain:$LD_LIBRARY_PATH" "$REPO_ROOT/usr/bin/ld.bfd.real" "$@"
 """
         repository_ctx.file("usr/bin/ld.bfd.wrapper", ld_bfd_wrapper_content, executable = True)
         # Rename the actual ld.bfd to ld.bfd.real and replace it with the wrapper
