@@ -161,7 +161,7 @@ def download_and_extract_packages(repository_ctx, packages, base_url_template, r
 
     # Symlink only the essential libraries needed by toolchain binaries themselves
     # (not libraries for compiling user code - those go in the sysroot)
-    toolchain_libs = ["libbfd*.so*", "libopcodes*.so*", "libmpc.so*", "libgmp.so*", "libmpfr.so*"]
+    toolchain_libs = ["libbfd*.so*", "libopcodes*.so*", "libctf*.so*", "libmpc.so*", "libgmp.so*", "libmpfr.so*"]
     for lib_pattern in toolchain_libs:
         repository_ctx.execute([
             "bash", "-c",
