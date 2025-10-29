@@ -1,0 +1,35 @@
+# Bazel configuration for multi-GCC toolchains
+
+# Common settings
+build --incompatible_enable_cc_toolchain_resolution
+build --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+
+# AutoSD 9 configuration (x86_64)
+build:autosd9 --extra_toolchains=@autosd_9_gcc_repo//:gcc_toolchain_linux_x86_64
+build:autosd9 --host_platform=//constraints:autosd9_x86_64
+build:autosd9 --platforms=//constraints:autosd9_x86_64
+
+# AutoSD 9 configuration (aarch64)
+build:autosd9_aarch64 --extra_toolchains=@autosd_9_gcc_repo//:gcc_toolchain_linux_aarch64
+build:autosd9_aarch64 --host_platform=//constraints:autosd9_aarch64
+build:autosd9_aarch64 --platforms=//constraints:autosd9_aarch64
+
+# AutoSD 10 configuration (x86_64)
+build:autosd10 --extra_toolchains=@autosd_10_gcc_repo//:gcc_toolchain_linux_x86_64
+build:autosd10 --host_platform=//constraints:autosd10_x86_64
+build:autosd10 --platforms=//constraints:autosd10_x86_64
+
+# AutoSD 10 configuration (aarch64)
+build:autosd10_aarch64 --extra_toolchains=@autosd_10_gcc_repo//:gcc_toolchain_linux_aarch64
+build:autosd10_aarch64 --host_platform=//constraints:autosd10_aarch64
+build:autosd10_aarch64 --platforms=//constraints:autosd10_aarch64
+
+# Fedora configuration (x86_64)
+build:fedora --extra_toolchains=@fedora_gcc_repo//:gcc_toolchain_linux_x86_64
+build:fedora --host_platform=//constraints:fedora42_x86_64
+build:fedora --platforms=//constraints:fedora42_x86_64
+
+# Fedora configuration (aarch64)
+build:fedora_aarch64 --extra_toolchains=@fedora_gcc_repo//:gcc_toolchain_linux_aarch64
+build:fedora_aarch64 --host_platform=//constraints:fedora42_aarch64
+build:fedora_aarch64 --platforms=//constraints:fedora42_aarch64

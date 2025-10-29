@@ -19,20 +19,36 @@ alias(
     actual = "//fedora_gcc:gcc_toolchain_linux_aarch64",
 )
 
-# Convenience aliases to CentOS toolchain
+# Convenience aliases to AutoSD 10 toolchain
 alias(
-    name = "centos_gcc_toolchain",
-    actual = "//centos_gcc:gcc_toolchain",
+    name = "autosd_10_gcc_toolchain",
+    actual = "//autosd_10_gcc:gcc_toolchain",
 )
 
 alias(
-    name = "centos_gcc_toolchain_linux_x86_64",
-    actual = "//centos_gcc:gcc_toolchain_linux_x86_64",
+    name = "autosd_10_gcc_toolchain_linux_x86_64",
+    actual = "//autosd_10_gcc:gcc_toolchain_linux_x86_64",
 )
 
 alias(
-    name = "centos_gcc_toolchain_linux_aarch64",
-    actual = "//centos_gcc:gcc_toolchain_linux_aarch64",
+    name = "autosd_10_gcc_toolchain_linux_aarch64",
+    actual = "//autosd_10_gcc:gcc_toolchain_linux_aarch64",
+)
+
+# Convenience aliases to AutoSD 9 toolchain
+alias(
+    name = "autosd_9_gcc_toolchain",
+    actual = "//autosd_9_gcc:gcc_toolchain",
+)
+
+alias(
+    name = "autosd_9_gcc_toolchain_linux_x86_64",
+    actual = "//autosd_9_gcc:gcc_toolchain_linux_x86_64",
+)
+
+alias(
+    name = "autosd_9_gcc_toolchain_linux_aarch64",
+    actual = "//autosd_9_gcc:gcc_toolchain_linux_aarch64",
 )
 
 # Convenience aliases to Host toolchain
