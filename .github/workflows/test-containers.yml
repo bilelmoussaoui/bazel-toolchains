@@ -1,0 +1,49 @@
+name: Test Container Builds
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-containers:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - container: autosd9
+            config: autosd9
+            dockerfile: Containerfile.autosd9
+            description: "AutoSD 9 isolated toolchain"
+          - container: autosd9_host
+            config: host
+            dockerfile: Containerfile.autosd9_host
+            description: "Host toolchain"
+
+    name: Test ${{ matrix.description }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Build container image
+        run: |
+          cd containers
+          podman build -t localhost/${{ matrix.container }} -f ${{ matrix.dockerfile }} .
+
+      - name: Build and run simple_c example
+        run: |
+          podman run --rm -v "$(pwd)":/workspace:Z -w /workspace localhost/${{ matrix.container }} \
+            bazel run --config=${{ matrix.config }} //examples/simple_c:hello
+
+      - name: Build and run custom_flags example
+        run: |
+          podman run --rm -v "$(pwd)":/workspace:Z -w /workspace localhost/${{ matrix.container }} \
+            bazel run --config=${{ matrix.config }} //examples/custom_flags:custom_flags_demo
+
+      - name: Build static linking example
+        run: |
+          podman run --rm -v "$(pwd)":/workspace:Z -w /workspace localhost/${{ matrix.container }} \
+            bazel build --config=${{ matrix.config }} //examples/simple_c:hello_static
