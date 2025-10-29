@@ -117,7 +117,7 @@ _PACKAGES_BY_ARCH = {
         },
         "kernel-headers": {
             "version": "6.14.0-63.fc42",
-            "sha256": "d4b2bf8420ae9606c7df17dc39a524dc0fd67c5a016549fc57c791073093e0ac",
+            "sha256": "78d69dc4c0fb7c30f1fec3f42344355527ef4061d1729d9b5c184c6ee3e97cda",
             "subpath": "k"
         },
         "glibc": {
