@@ -213,6 +213,11 @@ autosd_10_gcc_toolchain = repository_rule(
 
 def _autosd_10_gcc_extension_impl(module_ctx):
     """Extension implementation for AutoSD 10 GCC toolchain"""
+    # Default flags from the repository rule
+    default_c_flags = ["-O2", "-g", "-pipe", "-Wall", "-Werror=format-security"]
+    default_cxx_flags = ["-O2", "-g", "-pipe", "-Wall", "-Werror=format-security"]
+    default_link_flags = ["-Wl,-z,relro", "-Wl,-z,now"]
+
     # Create a separate toolchain for each module
     for i, mod in enumerate(module_ctx.modules):
         # Generate unique name for each module's toolchain
@@ -222,11 +227,27 @@ def _autosd_10_gcc_extension_impl(module_ctx):
         c_flags = []
         cxx_flags = []
         link_flags = []
+        replace_mode = False
 
         for config_tag in mod.tags.configure:
+            if config_tag.replace:
+                replace_mode = True
             c_flags.extend(config_tag.c_flags)
             cxx_flags.extend(config_tag.cxx_flags)
             link_flags.extend(config_tag.link_flags)
+
+        # If not in replace mode, prepend defaults
+        if not replace_mode:
+            c_flags = default_c_flags + c_flags
+            cxx_flags = default_cxx_flags + cxx_flags
+            link_flags = default_link_flags + link_flags
+        # If no configuration provided at all, use defaults
+        elif not c_flags:
+            c_flags = default_c_flags
+        elif not cxx_flags:
+            cxx_flags = default_cxx_flags
+        elif not link_flags:
+            link_flags = default_link_flags
 
         autosd_10_gcc_toolchain(
             name = toolchain_name,
@@ -245,6 +266,10 @@ _configure_tag = tag_class(
         ),
         "link_flags": attr.string_list(
             doc = "Linker flags for the AutoSD 10 GCC toolchain",
+        ),
+        "replace": attr.bool(
+            doc = "If True, replace default flags. If False (default), append to default flags.",
+            default = False,
         ),
     },
     doc = "Configure compiler and linker flags for the AutoSD 10 GCC toolchain",
