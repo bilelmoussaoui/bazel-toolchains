@@ -31,8 +31,8 @@ _PACKAGES_BY_ARCH = {
             "sha256": "1f8dd90e7b2f751fbb3d0273356856ea5321c9e6e7036e0e83d3545e17a15171",
         },
         "glibc-devel": {
-            "version": "2.34-237.el9",
-            "sha256": "18392260e65abfebdcd53433d75fc2c8d89dd9f479b203856a18b748ba18d9ea",
+            "version": "2.34-238.el9",
+            "sha256": "b2adb2acc5dda72ad9d8cd064dc66c225ad1bad0240820e38f193f7dd0a1e634",
         },
         "libstdc++-devel": {
             "version": "11.5.0-11.el9",
@@ -43,12 +43,12 @@ _PACKAGES_BY_ARCH = {
             "sha256": "b17a28146ed5785049f59c22c7c93839f3d8f9c0ea860d8a5657c2d006c09718",
         },
         "kernel-headers": {
-            "version": "5.14.0-630.el9",
-            "sha256": "79b4516fe8ec02daa4f01482f28fd5737a78bf06ffc755a29c1f11f9e667116d",
+            "version": "5.14.0-632.el9",
+            "sha256": "3c7403269261816f1396fc8d42d4ea2a7cb822f561fa373b6f36d97c8975b67e",
         },
         "glibc": {
-            "version": "2.34-237.el9",
-            "sha256": "c80a36acd04d881699c19f8dc9157c7e616a570f5f5915453a38c31574c73089",
+            "version": "2.34-238.el9",
+            "sha256": "0ef834e8de2f02701e7c2ccc786eb197aa7a19daf0672c451e97c22cbd2ddee4",
         },
         "libgcc": {
             "version": "11.5.0-11.el9",
@@ -67,8 +67,8 @@ _PACKAGES_BY_ARCH = {
             "sha256": "179760104aa5a31ca463c586d0f21f380ba4d0eed212eee91bd1ca513e5d7a8d",
         },
         "glibc-headers": {
-            "version": "2.34-237.el9",
-            "sha256": "9a34165d1a4801010e5cf184490c37fed703a036df08f2cbe811c58f495de579",
+            "version": "2.34-238.el9",
+            "sha256": "8598348057506771f459948d145214878ac3991619879bfd56184b55998bf1bf",
         }
     },
     "aarch64": {
@@ -89,8 +89,8 @@ _PACKAGES_BY_ARCH = {
             "sha256": "30587742570a9ef33fdaf35f72c9bca2f6a0953eeb838fab573f6124c9ce4c83",
         },
         "glibc-devel": {
-            "version": "2.34-237.el9",
-            "sha256": "cb0f0030a787bfb3457d7818933435646c8226516da8e559adc5613394256f98",
+            "version": "2.34-238.el9",
+            "sha256": "187f75fda6804fd220a9b677df2180affb678d9088d753de02ae04a19fe042cf",
         },
         "libstdc++-devel": {
             "version": "11.5.0-11.el9",
@@ -101,12 +101,12 @@ _PACKAGES_BY_ARCH = {
             "sha256": "902d9be36b2954dae978a7f78437a1d69ead7c5a5e5e8d50c0bf187bf7aa6e8e",
         },
         "kernel-headers": {
-            "version": "5.14.0-630.el9",
-            "sha256": "31fa6a3f5bee9ed2e39833480d1f57673a448578e3ad0b9d60f4fce76795d236",
+            "version": "5.14.0-632.el9",
+            "sha256": "807b8050fe2c241b7d87a4dfc94682a93e620c1aff22c1f1cc1aeb2ebc60b1ab",
         },
         "glibc": {
-            "version": "2.34-237.el9",
-            "sha256": "53df8f2e39747130cf212977d943511dee0a461077380531ba69fc981a795b3a",
+            "version": "2.34-238.el9",
+            "sha256": "2bfda3f1a7cdabc43f4c4378fbf2cfa1d376fe7b1b1d1e7af60b3bea9217db8f",
         },
         "libgcc": {
             "version": "11.5.0-11.el9",
