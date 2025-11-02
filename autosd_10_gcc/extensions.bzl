@@ -31,8 +31,8 @@ _PACKAGES_BY_ARCH = {
             "sha256": "2deab9e4aa6fe34dea2d6e312c4a6d48a02288e627e94594b497397365e50712",
         },
         "glibc-devel": {
-            "version": "2.39-69.el10",
-            "sha256": "c0059b0f12ba7168d71ed53620732107614e7dfb660aa9d14f763bc48006f5b7",
+            "version": "2.39-76.el10",
+            "sha256": "ba6adc658c64f009d237a728c42fec0c4f963701251487f9f6db38a18237a891",
         },
         "libstdc++-devel": {
             "version": "14.3.1-2.3.el10",
@@ -43,12 +43,12 @@ _PACKAGES_BY_ARCH = {
             "sha256": "c0868f811d6b8a9cbc77f6c93dbdd1114e21699edf578eea083ee27c2a6b0b46",
         },
         "kernel-headers": {
-            "version": "6.12.0-145.el10",
-            "sha256": "411c251dec78e7c927ae022ec2bb14bd085e4672aafa0ba2e2bd51a82f6fd118",
+            "version": "6.12.0-150.el10",
+            "sha256": "6ae248ee2e314d9875418c5006af5e956f84ab0bb79c586e22006be7daa45756",
         },
         "glibc": {
-            "version": "2.39-69.el10",
-            "sha256": "8f7bc6fc34babf8609af6ac13953babcff88d819617ebb046863aa28a5db18d3",
+            "version": "2.39-76.el10",
+            "sha256": "c79380a6ac1ed7cdaab7545807c4db6c1c2242fa1a8bbd16e1fbf6b4c0b872ea",
         },
         "libgcc": {
             "version": "14.3.1-2.3.el10",
@@ -85,8 +85,8 @@ _PACKAGES_BY_ARCH = {
             "sha256": "5cda10bb09dba160cbfd8f629eb308bcb203df2468821afb1c2b51aed45cd8a7",
         },
         "glibc-devel": {
-            "version": "2.39-69.el10",
-            "sha256": "2eaad4365509547e1519ce55cd2c7e8d7b5cc42ef784c1feaddbbe547f385211",
+            "version": "2.39-76.el10",
+            "sha256": "a317c1303633ab69cb5bd5867bf9cb90620a01db853a06b2c5bdac3a170c4838",
         },
         "libstdc++-devel": {
             "version": "14.3.1-2.3.el10",
@@ -97,12 +97,12 @@ _PACKAGES_BY_ARCH = {
             "sha256": "9204d7de574e0e1b16ebf114dcd7922c59a33ae1568b72ec6e49d1d02dbf06f3",
         },
         "kernel-headers": {
-            "version": "6.12.0-145.el10",
-            "sha256": "ed22f45ff663286a92e5a8d97ec3216ef1c4c01084936bfe29d7d31009ef34ba",
+            "version": "6.12.0-150.el10",
+            "sha256": "591c4845190986885870f6a9979472d49d66fc58c829cffe495d1252330b913b",
         },
         "glibc": {
-            "version": "2.39-69.el10",
-            "sha256": "37f39e57d65bc469c49ec3614541fe8b20d16202e1770577e03e9b06cab23ef8",
+            "version": "2.39-76.el10",
+            "sha256": "1c42bd3031270237be11f591ec32483db34b772036eba06c6093f95f3569d871",
         },
         "libgcc": {
             "version": "14.3.1-2.3.el10",
