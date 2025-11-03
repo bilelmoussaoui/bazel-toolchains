@@ -3,7 +3,9 @@
 
 package(default_visibility = ["//visibility:public"])
 
-# Export the shared utilities
+# Export the shared utilities and templates
 exports_files([
     "toolchain_utils.bzl",
+    "BUILD.bazel.template",
+    "cc_toolchain_config.bzl.template",
 ])
