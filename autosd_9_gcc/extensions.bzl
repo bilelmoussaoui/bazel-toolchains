@@ -128,12 +128,7 @@ _PACKAGES_BY_ARCH = {
 }
 
 def _autosd_9_gcc_toolchain_impl(repository_ctx):
-    """Downloads AutoSD 9 RPM packages and creates an isolated GCC toolchain.
-
-    This function creates a complete, self-contained GCC toolchain by downloading
-    and extracting essential packages from AutoSD 9 repositories, then configuring
-    them to work independently of the host system.
-    """
+    """Downloads AutoSD 9 RPM packages and creates an isolated GCC toolchain."""
     # Use shared validation
     validate_system_requirements(repository_ctx)
 
@@ -153,17 +148,12 @@ def _autosd_9_gcc_toolchain_impl(repository_ctx):
     download_and_extract_packages(repository_ctx, packages, base_url_template, _AUTOSD_RELEASE, rpm_arch, "AutoSD {}".format(_AUTOSD_RELEASE))
 
 
-    # ==================================================================================
-    # BINUTILS COMPATIBILITY FIXES
-    # ==================================================================================
-    # Some distributions (e.g., AutoSD 9) don't include /usr/bin/ld as a separate file,
-    # only /usr/bin/ld.bfd. Create a symlink to ensure compatibility.
+    # Create ld symlink if needed (AutoSD 9 only has ld.bfd)
     if repository_ctx.path("usr/bin/ld.bfd").exists and not repository_ctx.path("usr/bin/ld").exists:
         repository_ctx.symlink("usr/bin/ld.bfd", "usr/bin/ld")
         print("Created symlink usr/bin/ld -> usr/bin/ld.bfd for compatibility")
 
-    # Create a wrapper for ld.bfd that sets LD_LIBRARY_PATH to find libctf.so.0 and other binutils libraries
-    # This is needed because ld.bfd is dynamically linked and needs to find its shared libraries
+    # Wrap ld.bfd to find its shared libraries (libctf, etc.)
     if repository_ctx.path("usr/bin/ld.bfd").exists:
         ld_bfd_wrapper_content = """#!/bin/sh
 # Wrapper for ld.bfd to set LD_LIBRARY_PATH for binutils shared libraries
@@ -179,13 +169,9 @@ exec env LD_LIBRARY_PATH="$REPO_ROOT/usr/lib64/toolchain:$LD_LIBRARY_PATH" "$REP
         repository_ctx.execute(["mv", "usr/bin/ld.bfd.wrapper", "usr/bin/ld.bfd"])
         print("Created LD_LIBRARY_PATH wrapper for ld.bfd")
 
-    # ==================================================================================
-    # AUTOSD 9 SPECIFIC: LINKER SCRIPT PATCHING
-    # ==================================================================================
-    # Fix linker scripts that contain absolute paths. In AutoSD 9, many .so files in
-    # /usr/lib64 are actually linker scripts (text files) that contain absolute paths
-    # like /lib64/libm.so.6. These absolute paths bypass --sysroot and cause linking
-    # to fail. We need to rewrite them to use relative paths within the sysroot.
+    # Fix linker scripts with absolute paths
+    # AutoSD 9 .so files are often text files with paths like /lib64/libm.so.6
+    # that bypass --sysroot. Prefix with = to make them sysroot-relative.
 
     repository_ctx.execute([
         "bash", "-c",
