@@ -305,13 +305,14 @@ def _autosd_9_gcc_extension_impl(module_ctx):
             c_flags = default_c_flags + c_flags
             cxx_flags = default_cxx_flags + cxx_flags
             link_flags = default_link_flags + link_flags
-        # If no configuration provided at all, use defaults
-        elif not c_flags:
-            c_flags = default_c_flags
-        elif not cxx_flags:
-            cxx_flags = default_cxx_flags
-        elif not link_flags:
-            link_flags = default_link_flags
+        # If in replace mode but no flags provided, use defaults
+        else:
+            if not c_flags:
+                c_flags = default_c_flags
+            if not cxx_flags:
+                cxx_flags = default_cxx_flags
+            if not link_flags:
+                link_flags = default_link_flags
 
         autosd_9_gcc_toolchain(
             name = toolchain_name,
