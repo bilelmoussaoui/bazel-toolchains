@@ -43,8 +43,8 @@ _PACKAGES_BY_ARCH = {
             "sha256": "b17a28146ed5785049f59c22c7c93839f3d8f9c0ea860d8a5657c2d006c09718",
         },
         "kernel-headers": {
-            "version": "5.14.0-634.el9",
-            "sha256": "1b5fa4ec36ba8e858ac96f20f80ab80b3cedbc56d27aaffd7c5012114e8e6099",
+            "version": "5.14.0-635.el9",
+            "sha256": "9ad19706820dc45864a85403cb317339dc35e91c428bb234fbd288af0e989d89",
         },
         "glibc": {
             "version": "2.34-238.el9",
@@ -101,8 +101,8 @@ _PACKAGES_BY_ARCH = {
             "sha256": "902d9be36b2954dae978a7f78437a1d69ead7c5a5e5e8d50c0bf187bf7aa6e8e",
         },
         "kernel-headers": {
-            "version": "5.14.0-634.el9",
-            "sha256": "21ff6c8fbec1e5cc87a15b658bb9133db59411c5ee592900bb72ee1323ed6de2",
+            "version": "5.14.0-635.el9",
+            "sha256": "5da282e3cc0153756e139cd7d7231fff9eca5d4aae18d9d7ae3dcf1b49e1470c",
         },
         "glibc": {
             "version": "2.34-238.el9",
