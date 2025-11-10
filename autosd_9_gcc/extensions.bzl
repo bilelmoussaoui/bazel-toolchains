@@ -2,203 +2,61 @@
 AutoSD 9 GCC Toolchain for Bazel
 
 This extension provides an isolated GCC toolchain built from AutoSD 9 (CentOS Stream 9) RPM packages.
+Uses dynamic package discovery from the repository.
 """
 
-load("//common:toolchain_utils.bzl", "validate_system_requirements", "get_target_architecture",
-     "detect_gcc_version", "download_and_extract_packages")
+load("//common:toolchain_utils.bzl", "validate_system_requirements", "get_target_architecture", "detect_gcc_version")
 
-# Configuration
 _AUTOSD_RELEASE = "9"
+_REPO_BASE_URL = "https://autosd.sig.centos.org/AutoSD-9/nightly/repos/AutoSD/compose/AutoSD"
 
-# Essential packages for a complete GCC toolchain - organized by architecture
-# Note: AutoSD 9 is based on CentOS Stream 9 with GCC 11 and glibc 2.34
-_PACKAGES_BY_ARCH = {
-    "x86_64": {
-        "gcc": {
-            "version": "11.5.0-11.el9",
-            "sha256": "750debb1d5e6d319df6057dc56b19b8ab9c814c80be5f3576e9a3c960fa007cf",
-        },
-        "gcc-c++": {
-            "version": "11.5.0-11.el9",
-            "sha256": "d7d95edd8fca8d5af327eaa141c1d3279440052637666ccafc87c065164fd16e",
-        },
-        "cpp": {
-            "version": "11.5.0-11.el9",
-            "sha256": "cfdf4d60773d0924b21c579b830086be01e8139983ec6b1375becbfefe926fb4",
-        },
-        "binutils": {
-            "version": "2.35.2-67.el9",
-            "sha256": "1f8dd90e7b2f751fbb3d0273356856ea5321c9e6e7036e0e83d3545e17a15171",
-        },
-        "glibc-devel": {
-            "version": "2.34-238.el9",
-            "sha256": "b2adb2acc5dda72ad9d8cd064dc66c225ad1bad0240820e38f193f7dd0a1e634",
-        },
-        "libstdc++-devel": {
-            "version": "11.5.0-11.el9",
-            "sha256": "f7717e045791df32100738ef74ceb0e83539d0c183cd7be684b8a01c43a72396",
-        },
-        "libstdc++": {
-            "version": "11.5.0-11.el9",
-            "sha256": "b17a28146ed5785049f59c22c7c93839f3d8f9c0ea860d8a5657c2d006c09718",
-        },
-        "kernel-headers": {
-            "version": "5.14.0-635.el9",
-            "sha256": "9ad19706820dc45864a85403cb317339dc35e91c428bb234fbd288af0e989d89",
-        },
-        "glibc": {
-            "version": "2.34-238.el9",
-            "sha256": "0ef834e8de2f02701e7c2ccc786eb197aa7a19daf0672c451e97c22cbd2ddee4",
-        },
-        "libgcc": {
-            "version": "11.5.0-11.el9",
-            "sha256": "405ee42b5de5be323e9e95be3ef806f22ee6d375e15158eb7819895cb163594f",
-        },
-        "libmpc": {
-            "version": "1.2.1-4.el9",
-            "sha256": "207e758fadd4779cb11b91a78446f098d0a95b782f30a24c0e998fe08e2561df",
-        },
-        "gmp": {
-            "version": "6.2.0-13.el9",
-            "sha256": "b6d592895ccc0fcad6106cd41800cd9d68e5384c418e53a2c3ff2ac8c8b15a33",
-        },
-        "mpfr": {
-            "version": "4.1.0-7.el9",
-            "sha256": "179760104aa5a31ca463c586d0f21f380ba4d0eed212eee91bd1ca513e5d7a8d",
-        },
-        "glibc-headers": {
-            "version": "2.34-238.el9",
-            "sha256": "8598348057506771f459948d145214878ac3991619879bfd56184b55998bf1bf",
-        }
-    },
-    "aarch64": {
-        "gcc": {
-            "version": "11.5.0-11.el9",
-            "sha256": "da7237a7951b9f86eb147f4d369005f9b39025de9101656090a36ea1a6cd3eaa",
-        },
-        "gcc-c++": {
-            "version": "11.5.0-11.el9",
-            "sha256": "69fd1cb2fa681ade63ade1c93802bda31a163601bb1e2bfa88a61f3b5bd5fe14",
-        },
-        "cpp": {
-            "version": "11.5.0-11.el9",
-            "sha256": "877828f0d889456660d81dcbd39178d3565fb9021fb2193742e3354eeb959eb8",
-        },
-        "binutils": {
-            "version": "2.35.2-67.el9",
-            "sha256": "30587742570a9ef33fdaf35f72c9bca2f6a0953eeb838fab573f6124c9ce4c83",
-        },
-        "glibc-devel": {
-            "version": "2.34-238.el9",
-            "sha256": "187f75fda6804fd220a9b677df2180affb678d9088d753de02ae04a19fe042cf",
-        },
-        "libstdc++-devel": {
-            "version": "11.5.0-11.el9",
-            "sha256": "4c00c380007f2268fc7e12c0284528fd88a3da0ab23760442ee5557b3e2b690c",
-        },
-        "libstdc++": {
-            "version": "11.5.0-11.el9",
-            "sha256": "902d9be36b2954dae978a7f78437a1d69ead7c5a5e5e8d50c0bf187bf7aa6e8e",
-        },
-        "kernel-headers": {
-            "version": "5.14.0-635.el9",
-            "sha256": "5da282e3cc0153756e139cd7d7231fff9eca5d4aae18d9d7ae3dcf1b49e1470c",
-        },
-        "glibc": {
-            "version": "2.34-238.el9",
-            "sha256": "2bfda3f1a7cdabc43f4c4378fbf2cfa1d376fe7b1b1d1e7af60b3bea9217db8f",
-        },
-        "libgcc": {
-            "version": "11.5.0-11.el9",
-            "sha256": "15a092304284044140344654776281f26ebb8a11d252de71fed7e49bc9b51663",
-        },
-        "libmpc": {
-            "version": "1.2.1-4.el9",
-            "sha256": "489bd89037b1a77d696e391315c740f185e6447aacdb1d7fe84b411491c34b88",
-        },
-        "gmp": {
-            "version": "6.2.0-13.el9",
-            "sha256": "01716c2de2af5ddce80cfc2f81fbcabe50670583f8d3ebf8af1058982edb9c70",
-        },
-        "mpfr": {
-            "version": "4.1.0-7.el9",
-            "sha256": "f3bd8510505a53450abe05dc34edbc5313fe89a6f88d0252624205dc7bb884c7",
-        }
-    }
-}
+# Packages to download (versions discovered dynamically)
+_PACKAGES = [
+    "gcc",
+    "gcc-c++",
+    "cpp",
+    "binutils",
+    "glibc-devel",
+    "glibc-headers",
+    "libstdc++-devel",
+    "libstdc++",
+    "kernel-headers",
+    "glibc",
+    "libgcc",
+    "libmpc",
+    "gmp",
+    "mpfr",
+]
 
 def _autosd_9_gcc_toolchain_impl(repository_ctx):
     """Downloads AutoSD 9 RPM packages and creates an isolated GCC toolchain."""
-    # Use shared validation
     validate_system_requirements(repository_ctx)
 
-    # Use shared architecture detection
     rpm_arch = get_target_architecture(repository_ctx)
+    repo_url = "{}/{}".format(_REPO_BASE_URL, rpm_arch)
 
-    # Get packages for the current architecture
-    packages = _PACKAGES_BY_ARCH.get(rpm_arch)
-    if not packages:
-        fail("No packages defined for architecture: {}. Supported architectures: {}".format(
-            rpm_arch, list(_PACKAGES_BY_ARCH.keys())
-        ))
+    print("Setting up AutoSD {} GCC toolchain for {}".format(_AUTOSD_RELEASE, rpm_arch))
 
-    # Use shared download and extraction logic
-    # AutoSD 9 uses the same URL structure as AutoSD 10
-    base_url_template = "https://autosd.sig.centos.org/AutoSD-{release}/nightly/repos/AutoSD/compose/AutoSD/{arch}/os/Packages/{pkg_name}-{version}.{arch}.rpm"
-    download_and_extract_packages(repository_ctx, packages, base_url_template, _AUTOSD_RELEASE, rpm_arch, "AutoSD {}".format(_AUTOSD_RELEASE))
+    # Copy setup script to repository
+    repository_ctx.template(
+        "setup_toolchain.sh",
+        Label("@multi_gcc_toolchain//common:setup_toolchain.sh"),
+        substitutions = {},
+        executable = True,
+    )
 
+    # Run setup script with unbuffered output
+    setup_args = ["bash", "-c", "exec ./setup_toolchain.sh 'autosd9' '{}' '{}' {}".format(
+        "{}/os".format(repo_url),
+        rpm_arch,
+        " ".join(["'{}'".format(p) for p in _PACKAGES])
+    )]
 
-    # Create ld symlink if needed (AutoSD 9 only has ld.bfd)
-    if repository_ctx.path("usr/bin/ld.bfd").exists and not repository_ctx.path("usr/bin/ld").exists:
-        repository_ctx.symlink("usr/bin/ld.bfd", "usr/bin/ld")
-        print("Created symlink usr/bin/ld -> usr/bin/ld.bfd for compatibility")
+    result = repository_ctx.execute(setup_args, quiet = False)
+    if result.return_code != 0:
+        fail("Failed to setup toolchain: {}\n{}".format(result.stderr, result.stdout))
 
-    # Wrap ld.bfd to find its shared libraries (libctf, etc.)
-    if repository_ctx.path("usr/bin/ld.bfd").exists:
-        ld_bfd_wrapper_content = """#!/bin/sh
-# Wrapper for ld.bfd to set LD_LIBRARY_PATH for binutils shared libraries
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-REPO_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
-# Only add the toolchain-specific library directory, NOT the full lib64 (which contains libc)
-# Use env to set LD_LIBRARY_PATH only for the exec'd command, not for the shell itself
-exec env LD_LIBRARY_PATH="$REPO_ROOT/usr/lib64/toolchain:$LD_LIBRARY_PATH" "$REPO_ROOT/usr/bin/ld.bfd.real" "$@"
-"""
-        repository_ctx.file("usr/bin/ld.bfd.wrapper", ld_bfd_wrapper_content, executable = True)
-        # Rename the actual ld.bfd to ld.bfd.real and replace it with the wrapper
-        repository_ctx.execute(["mv", "usr/bin/ld.bfd", "usr/bin/ld.bfd.real"])
-        repository_ctx.execute(["mv", "usr/bin/ld.bfd.wrapper", "usr/bin/ld.bfd"])
-        print("Created LD_LIBRARY_PATH wrapper for ld.bfd")
-
-    # Fix linker scripts with absolute paths
-    # AutoSD 9 .so files are often text files with paths like /lib64/libm.so.6
-    # that bypass --sysroot. Prefix with = to make them sysroot-relative.
-
-    repository_ctx.execute([
-        "bash", "-c",
-        """
-        find usr/lib64 usr/lib -name '*.so' -type f 2>/dev/null | while read f; do
-          # Check if it's a linker script by looking for "GNU ld script" or if it's small text
-          if head -c 1024 "$f" 2>/dev/null | grep -q "GNU ld script"; then
-            echo "Found linker script: $f"
-            # Use sed to replace absolute paths with sysroot-relative paths
-            # The = prefix makes paths relative to the sysroot in GCC/LD
-            sed -i \\
-              -e 's|/usr/lib64/|=/usr/lib64/|g' \\
-              -e 's|/usr/lib/|=/usr/lib/|g' \\
-              -e 's| /lib64/| =/lib64/|g' \\
-              -e 's|^/lib64/|=/lib64/|g' \\
-              -e 's|(/lib64/|(=/lib64/|g' \\
-              -e 's| /lib/| =/lib/|g' \\
-              -e 's|^/lib/|=/lib/|g' \\
-              -e 's|(/lib/|(=/lib/|g' \\
-              "$f"
-            echo "---"
-          fi
-        done
-        """
-    ])
-
-    # Use shared GCC version detection
+    # Detect GCC version
     gcc_version, gcc_major = detect_gcc_version(repository_ctx)
 
     # Use flags passed from the extension (or defaults if none provided)

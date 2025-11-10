@@ -99,6 +99,7 @@ autosd_9_gcc.configure(
 - Self-contained environments with no host dependencies
 - Header isolation via `-nostdinc`/`-nostdinc++`
 - Sysroot-based linking with `--sysroot`
+- Dynamic package discovery and download (always uses latest versions)
 - Automatic RPM download and extraction
 
 ### Host Toolchain
@@ -107,14 +108,6 @@ autosd_9_gcc.configure(
 - Automatic detection of system headers and libraries
 - Fast builds with no download overhead
 - Ideal for local development
-
-## Updating Package Versions
-
-```bash
-python3 update_packages.py
-```
-
-Generates `package_versions.json` with the latest package versions and SHA256 hashes for all distributions and architectures.
 
 ## Repository Structure
 
