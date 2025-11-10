@@ -2,153 +2,60 @@
 AutoSD 10 GCC Toolchain for Bazel
 
 This extension provides an isolated GCC toolchain built from AutoSD 10 (CentOS Stream 10) RPM packages.
+Uses dynamic package discovery from the repository.
 """
 
-load("//common:toolchain_utils.bzl", "validate_system_requirements", "get_target_architecture",
-     "detect_gcc_version", "download_and_extract_packages")
+load("//common:toolchain_utils.bzl", "validate_system_requirements", "get_target_architecture", "detect_gcc_version")
 
-# Configuration
 _AUTOSD_RELEASE = "10"
+_REPO_BASE_URL = "https://autosd.sig.centos.org/AutoSD-10/nightly/repos/AutoSD/compose/AutoSD"
 
-# Essential packages for a complete GCC toolchain - organized by architecture
-# Note: AutoSD 10 uses CentOS Stream 10 package versions and repository structure
-_PACKAGES_BY_ARCH = {
-    "x86_64": {
-        "gcc": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "ece43ba0e34ff0513dfdd13fc41355c88f28b7e4f675a9c1e16c43f3efdcda64",
-        },
-        "gcc-c++": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "d5bee4d8b00c8dde8e826ec160e39de4424e62cf713a9ba18d92a23b87917c54",
-        },
-        "cpp": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "6a23043713d8027c658133310b6d878a86af26e36ad05328ec0f405f1facff1b",
-        },
-        "binutils": {
-            "version": "2.41-58.el10",
-            "sha256": "2deab9e4aa6fe34dea2d6e312c4a6d48a02288e627e94594b497397365e50712",
-        },
-        "glibc-devel": {
-            "version": "2.39-76.el10",
-            "sha256": "ba6adc658c64f009d237a728c42fec0c4f963701251487f9f6db38a18237a891",
-        },
-        "libstdc++-devel": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "ad622697cf23df121db3d6ba1133a6f37a122038e8d447813f3c8645b872446c",
-        },
-        "libstdc++": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "c0868f811d6b8a9cbc77f6c93dbdd1114e21699edf578eea083ee27c2a6b0b46",
-        },
-        "kernel-headers": {
-            "version": "6.12.0-152.el10",
-            "sha256": "590211743b6807b0fff7cc235fa3df3356d8329ae3084acf2cf08da7a01104e8",
-        },
-        "glibc": {
-            "version": "2.39-76.el10",
-            "sha256": "c79380a6ac1ed7cdaab7545807c4db6c1c2242fa1a8bbd16e1fbf6b4c0b872ea",
-        },
-        "libgcc": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "96a64df25761b109296eeed6bf14f0b827de986956a47d25078d0c04340a5b19",
-        },
-        "libmpc": {
-            "version": "1.3.1-7.el10",
-            "sha256": "daaa73a35dfe21a8201581e333b79ccd296ae87a93f9796ba522e58edc23777c",
-        },
-        "gmp": {
-            "version": "6.2.1-12.el10",
-            "sha256": "6678824b5d45f9b66e8bfeb8f32736e0d710e3b38531a85548f55702d96b63a8",
-        },
-        "mpfr": {
-            "version": "4.2.1-5.el10",
-            "sha256": "a70bc74bde41c17df2d789ffc2a3c3034e1203c6a6c50e6133994f130d23e6bb",
-        },
-    },
-    "aarch64": {
-        "gcc": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "4340f6ef5e701b218e7f04a82828dedb813bab03b76c92d40da2caac373f1f57",
-        },
-        "gcc-c++": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "6112cf4c998f17ed05c034bcabcad6a630735d75586619fb186fd1da2c0a066e",
-        },
-        "cpp": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "b1a2a2b5937b95baa95588c3938d64829c71abf9328d2697e4560aa4a240137f",
-        },
-        "binutils": {
-            "version": "2.41-58.el10",
-            "sha256": "5cda10bb09dba160cbfd8f629eb308bcb203df2468821afb1c2b51aed45cd8a7",
-        },
-        "glibc-devel": {
-            "version": "2.39-76.el10",
-            "sha256": "a317c1303633ab69cb5bd5867bf9cb90620a01db853a06b2c5bdac3a170c4838",
-        },
-        "libstdc++-devel": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "0b4482a4b1134da4f4bbd5bc9552d4e6fe97419df13533e07e2bbe72836b6fb5",
-        },
-        "libstdc++": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "9204d7de574e0e1b16ebf114dcd7922c59a33ae1568b72ec6e49d1d02dbf06f3",
-        },
-        "kernel-headers": {
-            "version": "6.12.0-152.el10",
-            "sha256": "387de18bd8ea6eb914fb5f5154c4c57fbbd1b7bb047844602808a2c739f47f88",
-        },
-        "glibc": {
-            "version": "2.39-76.el10",
-            "sha256": "1c42bd3031270237be11f591ec32483db34b772036eba06c6093f95f3569d871",
-        },
-        "libgcc": {
-            "version": "14.3.1-2.3.el10",
-            "sha256": "392c0f450ffb7d91f405f71b8c4ea531aaf5223542d7deced2602d70b4644a22",
-        },
-        "libmpc": {
-            "version": "1.3.1-7.el10",
-            "sha256": "bb46a7465559a26c085bf1c02f0764332430a6c1b8fb3f08c8cee184e3d1f02a",
-        },
-        "gmp": {
-            "version": "6.2.1-12.el10",
-            "sha256": "9bbe58df2a29320daf9b4c36305fcc7f781ab0bdd486736c6d8c685838141a41",
-        },
-        "mpfr": {
-            "version": "4.2.1-5.el10",
-            "sha256": "30067f4b30700a4dbe21ee5ce458f3a6ab41b7a419b8be572e21967316877b10",
-        },
-    },
-}
+# Packages to download (versions discovered dynamically)
+_PACKAGES = [
+    "gcc",
+    "gcc-c++",
+    "cpp",
+    "binutils",
+    "glibc-devel",  # Includes glibc-headers in AutoSD 10
+    "libstdc++-devel",
+    "libstdc++",
+    "kernel-headers",
+    "glibc",
+    "libgcc",
+    "libmpc",
+    "gmp",
+    "mpfr",
+]
 
 def _autosd_10_gcc_toolchain_impl(repository_ctx):
-    """Downloads AutoSD 10 RPM packages and creates an isolated GCC toolchain.
-
-    This function creates a complete, self-contained GCC toolchain by downloading
-    and extracting essential packages from AutoSD 10 repositories, then configuring
-    them to work independently of the host system.
-    """
-    # Use shared validation
+    """Downloads AutoSD 10 RPM packages and creates an isolated GCC toolchain."""
     validate_system_requirements(repository_ctx)
 
-    # Use shared architecture detection
     rpm_arch = get_target_architecture(repository_ctx)
+    repo_url = "{}/{}".format(_REPO_BASE_URL, rpm_arch)
 
-    # Get packages for the current architecture
-    packages = _PACKAGES_BY_ARCH.get(rpm_arch)
-    if not packages:
-        fail("No packages defined for architecture: {}. Supported architectures: {}".format(
-            rpm_arch, list(_PACKAGES_BY_ARCH.keys())
-        ))
+    print("Setting up AutoSD {} GCC toolchain for {}".format(_AUTOSD_RELEASE, rpm_arch))
 
-    # Use shared download and extraction logic
-    # AutoSD 10 uses CentOS Stream 10 URL structure - no subpath needed
-    base_url_template = "https://download.autosd.sig.centos.org/AutoSD-{release}/nightly/repos/AutoSD/compose/AutoSD/{arch}/os/Packages/{pkg_name}-{version}.{arch}.rpm"
-    download_and_extract_packages(repository_ctx, packages, base_url_template, _AUTOSD_RELEASE, rpm_arch, "AutoSD {}".format(_AUTOSD_RELEASE))
+    # Copy setup script to repository
+    repository_ctx.template(
+        "setup_toolchain.sh",
+        Label("@multi_gcc_toolchain//common:setup_toolchain.sh"),
+        substitutions = {},
+        executable = True,
+    )
 
-    # Use shared GCC version detection
+    # Run setup script with unbuffered output
+    setup_args = ["bash", "-c", "exec ./setup_toolchain.sh 'autosd10' '{}' '{}' {}".format(
+        "{}/os".format(repo_url),
+        rpm_arch,
+        " ".join(["'{}'".format(p) for p in _PACKAGES])
+    )]
+
+    result = repository_ctx.execute(setup_args, quiet = False)
+    if result.return_code != 0:
+        fail("Failed to setup toolchain: {}\n{}".format(result.stderr, result.stdout))
+
+    # Detect GCC version
     gcc_version, gcc_major = detect_gcc_version(repository_ctx)
 
     # Use flags passed from the extension (or defaults if none provided)
